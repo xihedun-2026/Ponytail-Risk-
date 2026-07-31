@@ -37,8 +37,8 @@ info "Node $(node -v)"
 # ---------- 2. Rust 引擎 ----------
 # Windows 的 Git Bash / MSYS 下产物带 .exe 后缀，否则下面的 -x 判断永远为假。
 case "$(uname -s)" in
-  MINGW*|MSYS*|CYGWIN*) ENGINE="target/release/wdsf-live-data.exe" ;;
-  *) ENGINE="target/release/wdsf-live-data" ;;
+  MINGW*|MSYS*|CYGWIN*) ENGINE="target/release/risk-live-data.exe" ;;
+  *) ENGINE="target/release/risk-live-data" ;;
 esac
 # 只看"文件存在且可执行"不够：从别的机器同步过来的二进制架构可能不对，
 # 在本机根本跑不起来。这里直接试运行一次自检来判断。
@@ -74,8 +74,8 @@ if ! engine_works; then
   然后重跑本脚本。"
 
   info "正在构建 Rust 引擎（首次约 1-2 分钟，之后秒开）…"
-  # 只构建引擎；wdsf-probe 依赖 russh/tokio，本地跑网页用不到。
-  cargo build --release -p wdsf-engine
+  # 只构建引擎；risk-probe 依赖 russh/tokio，本地跑网页用不到。
+  cargo build --release -p risk-engine
 fi
 engine_works || fail "引擎构建后仍无法运行：$ENGINE"
 info "引擎就绪"
@@ -89,20 +89,20 @@ if [ -f .env.local ]; then
   info "已载入 .env.local"
 fi
 export RISK_PORTAL_KEY="${RISK_PORTAL_KEY:-PONYTAIL-LOCAL-2026}"
-export WDSF_LIVE="${WDSF_LIVE:-0}"
+export GAME_DB_LIVE="${GAME_DB_LIVE:-0}"
 export RISK_PORT="${RISK_PORT:-4173}"
 
 # ---------- 4. 数据源 ----------
 # 数据库连接正常是在网页「规则与设置」页填写并加密保存的（data/ 目录下）。
 # 只有在 .env.local 里显式配了实时模式时，才在启动前预检一次。
-if [ "$WDSF_LIVE" = "1" ] && [ -n "${WDSF_DB_PASSWORD:-}" ]; then
+if [ "$GAME_DB_LIVE" = "1" ] && [ -n "${GAME_DB_PASSWORD:-}" ]; then
   info "检查数据库连通性…"
   CONN_ERR=$(mktemp)
   trap 'rm -f "$CONN_ERR"' EXIT
   if ! "$ENGINE" connection-test >/dev/null 2>"$CONN_ERR"; then
     warn "数据库连不上，先以演示数据启动。错误："
     sed 's/^/    /' "$CONN_ERR" >&2 || true
-    export WDSF_LIVE=0
+    export GAME_DB_LIVE=0
   else
     info "数据库连接正常，核心表可读。"
   fi

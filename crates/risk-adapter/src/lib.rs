@@ -1,4 +1,4 @@
-//! WDSF MySQL 只读适配层。
+//! RISK MySQL 只读适配层。
 //!
 //! 这一层只做连接、编解码和取数，**从不写游戏库**。
 //! 交接报告 §3 明确：实时模式不封号、不扣款、不修改游戏数据库。
@@ -53,20 +53,20 @@ fn database_identifier(env_name: &str, default: &str) -> Result<String> {
 impl Config {
     /// 从进程环境读取配置，与 `server.mjs::databaseEnvironment` 注入的变量一一对应。
     pub fn from_env() -> Result<Self> {
-        let password = env::var("WDSF_DB_PASSWORD").unwrap_or_default();
+        let password = env::var("GAME_DB_PASSWORD").unwrap_or_default();
         if password.is_empty() {
-            bail!("WDSF_DB_PASSWORD is required");
+            bail!("GAME_DB_PASSWORD is required");
         }
         Ok(Self {
-            host: env::var("WDSF_HOST").unwrap_or_else(|_| DEFAULT_HOST.to_string()),
-            port: env::var("WDSF_DB_PORT")
+            host: env::var("GAME_DB_HOST").unwrap_or_else(|_| DEFAULT_HOST.to_string()),
+            port: env::var("GAME_DB_PORT")
                 .ok()
                 .and_then(|value| value.parse().ok())
                 .unwrap_or(3306),
-            user: env::var("WDSF_DB_USER").unwrap_or_else(|_| "root".to_string()),
+            user: env::var("GAME_DB_USER").unwrap_or_else(|_| "root".to_string()),
             password,
-            main_database: database_identifier("WDSF_MDB", DEFAULT_MAIN_DATABASE)?,
-            log_database: database_identifier("WDSF_LDB", DEFAULT_LOG_DATABASE)?,
+            main_database: database_identifier("GAME_DB_MAIN", DEFAULT_MAIN_DATABASE)?,
+            log_database: database_identifier("GAME_DB_LOG", DEFAULT_LOG_DATABASE)?,
         })
     }
 }
@@ -191,14 +191,14 @@ fn to_params(values: &[Param]) -> Params {
     )
 }
 
-/// 一个 WDSF 只读连接。
-pub struct Wdsf {
+/// 一个 RISK 只读连接。
+pub struct GameDatabase {
     conn: Conn,
     main_database: String,
     log_database: String,
 }
 
-impl Wdsf {
+impl GameDatabase {
     /// 建立连接。`SET NAMES latin1` 让服务端不做转码，
     /// 由本地按 GBK 解码，保证与 Python 版取到完全相同的字节。
     pub fn connect(config: &Config) -> Result<Self> {
@@ -212,7 +212,7 @@ impl Wdsf {
             .read_timeout(Some(Duration::from_secs(8)))
             .write_timeout(Some(Duration::from_secs(8)))
             .init(vec!["SET NAMES latin1".to_string()]);
-        let conn = Conn::new(opts).context("连接 WDSF 数据库失败")?;
+        let conn = Conn::new(opts).context("连接 RISK 数据库失败")?;
         Ok(Self {
             conn,
             main_database: config.main_database.clone(),
@@ -240,11 +240,11 @@ impl Wdsf {
         let rows: Vec<mysql::Row> = self
             .conn
             .exec(&bound, to_params(params))
-            .with_context(|| "查询 WDSF 数据失败".to_string())?;
-        if env::var("WDSF_QUERY_TRACE").as_deref() == Ok("1") {
+            .with_context(|| "查询 RISK 数据失败".to_string())?;
+        if env::var("GAME_DB_QUERY_TRACE").as_deref() == Ok("1") {
             let label = sql.split_whitespace().take(8).collect::<Vec<_>>().join(" ");
             eprintln!(
-                "wdsf-query {}ms rows={} sql={label}",
+                "risk-query {}ms rows={} sql={label}",
                 started_at.elapsed().as_millis(),
                 rows.len()
             );

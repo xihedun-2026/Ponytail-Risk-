@@ -1,5 +1,5 @@
 [package]
-name = "wdsf-adapter"
+name = "risk-adapter"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true

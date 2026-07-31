@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { spawn } from "node:child_process";
+import { execFileSync, spawn } from "node:child_process";
 import { createCipheriv, createHash, randomBytes } from "node:crypto";
 import { existsSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { createServer } from "node:http";
@@ -10,6 +10,16 @@ import { compareRuleReplay } from "./rule_replay.mjs";
 
 // import.meta.dirname 要 Node 20.11+；这样算等价且不挑版本。
 const projectRoot = fileURLToPath(new URL(".", import.meta.url));
+
+const forbiddenMarkers = [Buffer.from([119, 100, 115, 102]).toString("ascii"), String.fromCodePoint(0x95ee, 0x9053)];
+const trackedFiles = execFileSync("git", ["ls-files", "-z"], { cwd: projectRoot }).toString("utf8").split("\0").filter(Boolean);
+for (const path of trackedFiles) {
+  const content = readFileSync(join(projectRoot, path)).toString("utf8").toLowerCase();
+  for (const marker of forbiddenMarkers) {
+    assert.equal(path.toLowerCase().includes(marker), false, `legacy marker in path: ${path}`);
+    assert.equal(content.includes(marker), false, `legacy marker in file: ${path}`);
+  }
+}
 
 const port = 4174;
 const base = `http://127.0.0.1:${port}`;
@@ -83,7 +93,7 @@ const child = spawn(process.execPath, ["server.mjs"], {
     RISK_SDK_ALLOW_INSECURE: "1",
     PGR_AGENT_LOCAL_TOKEN: "self-check-agent-token-that-is-long-enough",
     PGR_AGENT_PORT: "17879",
-    WDSF_LIVE: "0",
+    GAME_DB_LIVE: "0",
   },
   stdio: ["ignore", "pipe", "pipe"],
   windowsHide: true,
@@ -167,7 +177,7 @@ try {
   assert.match(linuxInstallerSource, /systemctl is-active --quiet/);
   assert.match(linuxInstallerSource, /Rolled back and healthy/);
   assert.match(linuxInstallerSource, /--check-only/);
-  assert.match(linuxBuilderSource, /cargo build --locked --release -p wdsf-engine -p wdsf-probe -p risk-agent -p risk-sdk/);
+  assert.match(linuxBuilderSource, /cargo build --locked --release -p risk-engine -p risk-probe -p risk-agent -p risk-sdk/);
   assert.match(linuxBuilderSource, /PGR_RELEASE_SIGNING_KEY/);
   assert.match(linuxBuilderSource, /PGR_NODE_SHA256/);
   assert.match(linuxBuilderSource, /openssl dgst -sha256 -sign/);

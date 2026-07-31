@@ -1,12 +1,12 @@
 [package]
-name = "wdsf-probe"
+name = "risk-probe"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 
 [[bin]]
-name = "wdsf-probe"
+name = "risk-probe"
 path = "src/main.rs"
 
 [dependencies]

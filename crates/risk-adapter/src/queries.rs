@@ -1,7 +1,7 @@
-//! 业务查询。每个函数对应 `tools/wdsf_live_data.py` 的同名函数，
+//! 业务查询。每个函数对应 `tools/risk_live_data.py` 的同名函数，
 //! 输出 JSON 结构与之保持一致，供阶段 5 的双算差异报告逐字段比对。
 //!
-//! SQL 里的 `dl_mdb_1` / `dl_ldb_1` 是占位库名，由 `Wdsf::bind_databases` 换成实际库名。
+//! SQL 里的 `dl_mdb_1` / `dl_ldb_1` 是占位库名，由 `GameDatabase::bind_databases` 换成实际库名。
 
 use std::collections::{HashMap, HashSet, VecDeque};
 use std::env;
@@ -19,7 +19,7 @@ use risk_core::{
 };
 use risk_ledger::{ledger_events, EventKind, LedgerEvent};
 
-use crate::{Param, Row, Wdsf};
+use crate::{GameDatabase, Param, Row};
 
 /// 查不到目标时的错误。引擎会把它翻译成 `{"error": ...}` 并以退出码 2 结束，
 /// `server.mjs` 据此返回 404。
@@ -177,7 +177,7 @@ fn distribution(values: &[i64]) -> Value {
 }
 
 /// 区服行为基线。只返回群体分布，不返回账号、角色、MAC 或 IP 原值。
-pub fn behavior_profile(db: &mut Wdsf) -> Result<Value> {
+pub fn behavior_profile(db: &mut GameDatabase) -> Result<Value> {
     let since = now_stamp_minus(ChronoDuration::days(30));
     let gameplay_caps = gameplay_caps_from_env()?;
     let reward_action_sql_list = reward_action_sql_list(&gameplay_caps);
@@ -315,7 +315,7 @@ fn gameplay_catalog_label(action: &str, bonus_name: &str, bonus_prop: &str) -> S
 }
 
 /// 最近 30 天奖励 action 目录。只返回聚合值和奖励样例，不暴露玩家身份。
-pub fn gameplay_catalog_result(db: &mut Wdsf) -> Result<Value> {
+pub fn gameplay_catalog_result(db: &mut GameDatabase) -> Result<Value> {
     let since = now_stamp_minus(ChronoDuration::days(30));
     let params = || [Param::Str(since.clone()), Param::Str(since.clone())];
     let actions = db.fetch_all(
@@ -425,7 +425,7 @@ const PLAYER_COLUMNS: &str = "update_time,dist,gid,name,account,create_time,last
      last_login_ip,last_login_mac,level,cash,balance,char_status";
 
 /// 按角色 ID / 账号 / 角色名定位玩家；不传查询条件时取最近登录的一个。
-pub fn find_player(db: &mut Wdsf, query: Option<&str>) -> Result<Row> {
+pub fn find_player(db: &mut GameDatabase, query: Option<&str>) -> Result<Row> {
     let row = match query.map(str::trim).filter(|value| !value.is_empty()) {
         Some(raw) => {
             let query: String = raw.chars().take(128).collect();
@@ -478,7 +478,7 @@ fn gold_jump_candidates(rows: &[Row]) -> Vec<GoldJump> {
 }
 
 pub fn unexplained_gold_jumps(
-    db: &mut Wdsf,
+    db: &mut GameDatabase,
     gid: &str,
     reward_action_sql_list: &str,
 ) -> Result<Vec<GoldJump>> {
@@ -1210,7 +1210,7 @@ fn facts_from_inputs(
 }
 
 /// 汇总单个角色的风险证据。
-pub fn player_facts(db: &mut Wdsf, player: &Row, median_gold_coin: i64) -> Result<Facts> {
+pub fn player_facts(db: &mut GameDatabase, player: &Row, median_gold_coin: i64) -> Result<Facts> {
     let gid = player.text("gid");
     let account = player.text("account");
     let since = now_stamp_minus(ChronoDuration::days(30));
@@ -1369,7 +1369,7 @@ pub fn player_facts(db: &mut Wdsf, player: &Row, median_gold_coin: i64) -> Resul
 type TimelineEntry = (String, String, String, String);
 
 /// 角色的资产与交易时间线，取最近 12 条。
-pub fn timeline(db: &mut Wdsf, player: &Row, facts: &Facts) -> Result<Vec<[String; 4]>> {
+pub fn timeline(db: &mut GameDatabase, player: &Row, facts: &Facts) -> Result<Vec<[String; 4]>> {
     let gid = player.text("gid");
     let account = player.text("account");
     let mut events: Vec<TimelineEntry> = Vec::new();
@@ -1577,7 +1577,7 @@ pub fn timeline(db: &mut Wdsf, player: &Row, facts: &Facts) -> Result<Vec<[Strin
 }
 
 /// 全服最近一次登录快照的金元宝中位数，用于「存量偏离」判定。
-pub fn median_gold_coin(db: &mut Wdsf) -> Result<i64> {
+pub fn median_gold_coin(db: &mut GameDatabase) -> Result<i64> {
     let rows = db.fetch_all(
         "select l.gid,l.gold_coin from dl_ldb_1.login_log l
          inner join (
@@ -1619,7 +1619,7 @@ where
         .collect()
 }
 
-fn bulk_player_facts(db: &mut Wdsf, players: &[Row]) -> Result<Vec<Facts>> {
+fn bulk_player_facts(db: &mut GameDatabase, players: &[Row]) -> Result<Vec<Facts>> {
     let since = now_stamp_minus(ChronoDuration::days(30));
     let gameplay_caps = gameplay_caps_from_env()?;
     let reward_action_sql_list = reward_action_sql_list(&gameplay_caps);
@@ -1848,13 +1848,13 @@ fn bulk_player_facts(db: &mut Wdsf, players: &[Row]) -> Result<Vec<Facts>> {
 }
 
 /// 单个玩家的完整分析结果。
-pub fn player_result(db: &mut Wdsf, query: Option<&str>) -> Result<Value> {
+pub fn player_result(db: &mut GameDatabase, query: Option<&str>) -> Result<Value> {
     let player = find_player(db, query)?;
     let median = median_gold_coin(db)?;
     player_result_for(db, &player, median)
 }
 
-fn player_result_for(db: &mut Wdsf, player: &Row, median: i64) -> Result<Value> {
+fn player_result_for(db: &mut GameDatabase, player: &Row, median: i64) -> Result<Value> {
     let facts = player_facts(db, player, median)?;
     let timeline_rows = timeline(db, player, &facts)?;
     Ok(player_result_from_facts(player, facts, timeline_rows))
@@ -1900,7 +1900,7 @@ fn player_result_from_facts(player: &Row, facts: Facts, timeline_rows: Vec<[Stri
 }
 
 /// 全部角色的分析结果。证据按表批量取回，告警/总览不生成详情页时间线。
-pub fn all_player_results(db: &mut Wdsf) -> Result<Vec<Value>> {
+pub fn all_player_results(db: &mut GameDatabase) -> Result<Vec<Value>> {
     let players = db.fetch_all(
         &format!(
             "select c.*,coalesce(items.item_count,0) item_count,
@@ -2023,7 +2023,7 @@ fn sort_alerts(mut alerts: Vec<Value>) -> Vec<Value> {
 }
 
 /// 告警队列。分数低于 20 的角色不入队。
-pub fn alerts_result(db: &mut Wdsf) -> Result<Vec<Value>> {
+pub fn alerts_result(db: &mut GameDatabase) -> Result<Vec<Value>> {
     let today = Local::now().format("%Y%m%d").to_string();
     let players = all_player_results(db)?;
     Ok(sort_alerts(
@@ -2050,7 +2050,7 @@ fn alerts_from_players(players: &[Value], today: &str) -> Vec<Value> {
 // ---------------------------------------------------------------------------
 
 /// 总览页数据。`started_at` 用于计算这次查询的耗时。
-pub fn dashboard_result(db: &mut Wdsf, started_at: std::time::Instant) -> Result<Value> {
+pub fn dashboard_result(db: &mut GameDatabase, started_at: std::time::Instant) -> Result<Value> {
     let today_start = Local::now().format("%Y%m%d000000").to_string();
     let today = Local::now().format("%Y%m%d").to_string();
 
@@ -2200,7 +2200,7 @@ fn asset_search_terms(raw: &str) -> (String, String) {
 }
 
 /// 先用客户知道的角色、账号或名称发现当前资产，再由 IID 进入完整溯源。
-pub fn asset_search_result(db: &mut Wdsf, query: Option<&str>) -> Result<Value> {
+pub fn asset_search_result(db: &mut GameDatabase, query: Option<&str>) -> Result<Value> {
     let (query, ascii) = asset_search_terms(query.unwrap_or_default());
     let iid = if ascii.is_empty() {
         String::new()
@@ -2261,7 +2261,7 @@ pub fn asset_search_result(db: &mut Wdsf, query: Option<&str>) -> Result<Value> 
 
 /// 资产完整路径。
 pub fn asset_result(
-    db: &mut Wdsf,
+    db: &mut GameDatabase,
     query: Option<&str>,
     ledger: Option<&rusqlite_alias::Connection>,
 ) -> Result<Value> {
@@ -2651,7 +2651,7 @@ fn resolve_asset_name(
 // ---------------------------------------------------------------------------
 
 /// 读取当前道具与宠物持有表，供账本比对。
-pub fn current_assets(db: &mut Wdsf) -> Result<Vec<risk_ledger::AssetRow>> {
+pub fn current_assets(db: &mut GameDatabase) -> Result<Vec<risk_ledger::AssetRow>> {
     let rows = db.fetch_all(
         "select iid,name,owner,owner_name,env,pos,amount from dl_mdb_1.item_info
          union all
@@ -2673,7 +2673,7 @@ pub fn current_assets(db: &mut Wdsf) -> Result<Vec<risk_ledger::AssetRow>> {
 }
 
 /// 连接测试：确认版本可读且七张核心表存在。
-pub fn connection_test(db: &mut Wdsf) -> Result<Value> {
+pub fn connection_test(db: &mut GameDatabase) -> Result<Value> {
     let version = db
         .fetch_one("select version() version", &[])?
         .map(|row| row.text("version"))
@@ -2691,7 +2691,7 @@ pub fn connection_test(db: &mut Wdsf) -> Result<Value> {
         "count",
     )?;
     if tables < 7 {
-        anyhow::bail!("required WDSF tables are missing");
+        anyhow::bail!("required RISK tables are missing");
     }
     Ok(json!({
         "ok": true,

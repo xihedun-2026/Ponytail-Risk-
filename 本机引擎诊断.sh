@@ -11,8 +11,8 @@ cd "$(dirname "$0")"
 
 # Windows 的 Git Bash / MSYS 下产物带 .exe 后缀。
 case "$(uname -s)" in
-  MINGW*|MSYS*|CYGWIN*) ENGINE="target/release/wdsf-live-data.exe" ;;
-  *) ENGINE="target/release/wdsf-live-data" ;;
+  MINGW*|MSYS*|CYGWIN*) ENGINE="target/release/risk-live-data.exe" ;;
+  *) ENGINE="target/release/risk-live-data" ;;
 esac
 echo "=== 1. 引擎二进制 ==="
 if [ ! -e "$ENGINE" ]; then
@@ -49,14 +49,14 @@ fi
 run_timed() { # run_timed <说明> <操作>
   local label="$1" op="$2" start end rc
   start=$(date +%s)
-  "$ENGINE" "$op" >/tmp/wdsf_diag_out.json 2>/tmp/wdsf_diag_err.txt
+  "$ENGINE" "$op" >/tmp/risk_diag_out.json 2>/tmp/risk_diag_err.txt
   rc=$?
   end=$(date +%s)
   echo "$label：退出码 $rc，耗时 $((end - start)) 秒"
   if [ "$rc" -ne 0 ]; then
-    echo "  stderr: $(head -c 300 /tmp/wdsf_diag_err.txt)"
+    echo "  stderr: $(head -c 300 /tmp/risk_diag_err.txt)"
   else
-    echo "  输出前 160 字节: $(head -c 160 /tmp/wdsf_diag_out.json)"
+    echo "  输出前 160 字节: $(head -c 160 /tmp/risk_diag_out.json)"
   fi
 }
 

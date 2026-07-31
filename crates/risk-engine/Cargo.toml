@@ -1,12 +1,12 @@
 [package]
-name = "wdsf-engine"
+name = "risk-engine"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 
 [[bin]]
-name = "wdsf-live-data"
+name = "risk-live-data"
 path = "src/main.rs"
 
 [dependencies]
@@ -17,4 +17,4 @@ risk-core = { path = "../risk-core" }
 risk-ledger = { path = "../risk-ledger" }
 rusqlite.workspace = true
 serde_json.workspace = true
-wdsf-adapter = { path = "../wdsf-adapter" }
+risk-adapter = { path = "../risk-adapter" }

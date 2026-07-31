@@ -1,6 +1,6 @@
-//! `wdsf-live-data`：WDSF 风控数据引擎 CLI。
+//! `risk-live-data`：RISK 风控数据引擎 CLI。
 //!
-//! 这是 `tools/wdsf_live_data.py` 的 drop-in 替代：相同的子命令、相同的环境变量、
+//! 这是 `tools/risk_live_data.py` 的 drop-in 替代：相同的子命令、相同的环境变量、
 //! stdout 输出同构 JSON、查不到目标时以退出码 2 返回 `{"error": ...}`。
 //! `server.mjs` 因此只需把可执行文件从 `python` 换成本二进制。
 
@@ -15,9 +15,9 @@ use clap::{Parser, ValueEnum};
 use rusqlite::Connection;
 use serde_json::{json, Value};
 
+use risk_adapter::queries::{self, LookupError};
+use risk_adapter::{Config, GameDatabase};
 use risk_ledger::{apply_snapshot, prepare_ledger};
-use wdsf_adapter::queries::{self, LookupError};
-use wdsf_adapter::{Config, Wdsf};
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, ValueEnum)]
 enum Operation {
@@ -41,8 +41,8 @@ enum Operation {
 
 #[derive(Parser, Debug)]
 #[command(
-    name = "wdsf-live-data",
-    about = "WDSF 行为风控数据引擎（只读）",
+    name = "risk-live-data",
+    about = "RISK 行为风控数据引擎（只读）",
     disable_help_subcommand = true
 )]
 struct Cli {
@@ -78,7 +78,7 @@ fn run(cli: Cli) -> Result<Value> {
     }
 
     let started_at = Instant::now();
-    let mut db = Wdsf::connect(&Config::from_env()?)?;
+    let mut db = GameDatabase::connect(&Config::from_env()?)?;
     let query = cli.query.as_deref();
 
     match cli.operation {
@@ -149,7 +149,7 @@ mod tests {
             "connection-test",
             "self-check",
         ] {
-            let cli = Cli::try_parse_from(["wdsf-live-data", name])
+            let cli = Cli::try_parse_from(["risk-live-data", name])
                 .unwrap_or_else(|error| panic!("操作 {name} 应可解析：{error}"));
             assert!(cli.query.is_none());
         }
@@ -157,19 +157,19 @@ mod tests {
 
     #[test]
     fn cli_accepts_optional_query() {
-        let cli = Cli::try_parse_from(["wdsf-live-data", "player", "1003281"]).unwrap();
+        let cli = Cli::try_parse_from(["risk-live-data", "player", "1003281"]).unwrap();
         assert_eq!(cli.operation, Operation::Player);
         assert_eq!(cli.query.as_deref(), Some("1003281"));
     }
 
     #[test]
     fn cli_rejects_unknown_operation() {
-        assert!(Cli::try_parse_from(["wdsf-live-data", "drop-database"]).is_err());
+        assert!(Cli::try_parse_from(["risk-live-data", "drop-database"]).is_err());
     }
 
     #[test]
     fn self_check_runs_without_database() {
-        let cli = Cli::try_parse_from(["wdsf-live-data", "self-check"]).unwrap();
+        let cli = Cli::try_parse_from(["risk-live-data", "self-check"]).unwrap();
         let result = run(cli).expect("自检不应依赖数据库");
         assert_eq!(result["ok"], true);
         assert!(result["checks"].as_u64().unwrap() >= 20);
@@ -178,7 +178,7 @@ mod tests {
     #[test]
     fn ledger_path_honours_env_override() {
         let temporary = std::env::temp_dir()
-            .join("wdsf-ledger-test")
+            .join("risk-ledger-test")
             .join("risk.db");
         std::env::set_var("RISK_DB_PATH", &temporary);
         let path = ledger_path().unwrap();

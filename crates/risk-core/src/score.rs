@@ -1,4 +1,4 @@
-//! 风险评分。规则集与权重逐条对齐 `tools/wdsf_live_data.py::risk_score`。
+//! 风险评分。规则集与权重逐条对齐 `tools/risk_live_data.py::risk_score`。
 //!
 //! 交接报告 §3.4 明确：这些规则只产生证据和复核建议，
 //! 不自动封号、扣款或冻结（影子模式）。

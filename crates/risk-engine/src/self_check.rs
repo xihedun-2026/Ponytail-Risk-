@@ -1,4 +1,4 @@
-//! 不依赖数据库的自检，对应 `tools/wdsf_live_data.py::self_check`。
+//! 不依赖数据库的自检，对应 `tools/risk_live_data.py::self_check`。
 //!
 //! 这些断言是 Python 版与 Rust 版共同的行为契约。任何一条失败都说明
 //! 移植过程中丢失了已确认的数据语义，必须停下来查，而不是改断言。

@@ -1,6 +1,6 @@
 //! GBK ↔ UTF-8 编解码。
 //!
-//! WDSF 的文本列以 GBK 字节存放在 latin1 列里。Python 版通过
+//! RISK 的文本列以 GBK 字节存放在 latin1 列里。Python 版通过
 //! `charset="latin1"` 拿到「按 latin1 解码的字符串」，再 `encode("latin1").decode("gbk")`
 //! 还原。Rust 版直接连接设为 latin1（单字节、字节透明），
 //! 从驱动取原始字节后一次性 GBK 解码，少一次往返转换。

@@ -7,7 +7,7 @@
 
 用法：
     python3 tools/parity_python.py [fixtures.json]
-输出：stdout 一份 JSON，结构与 `cargo test -p wdsf-engine --test parity` 内部生成的一致。
+输出：stdout 一份 JSON，结构与 `cargo test -p risk-engine --test parity` 内部生成的一致。
 """
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 
-# wdsf_live_data 在导入时就 import pymysql，但本脚本只用纯逻辑函数。
+# risk_live_data 在导入时就 import pymysql，但本脚本只用纯逻辑函数。
 # 放一个桩模块进 sys.modules，避免把数据库驱动变成跑校验的前置条件。
 if "pymysql" not in sys.modules:
     stub = types.ModuleType("pymysql")
@@ -32,7 +32,7 @@ if "pymysql" not in sys.modules:
     sys.modules["pymysql"] = stub
 
 sys.path.insert(0, str(ROOT))
-import wdsf_live_data as engine  # noqa: E402
+import risk_live_data as engine  # noqa: E402
 
 
 def run_risk_score(cases: list[dict]) -> list[dict]:

@@ -256,9 +256,9 @@ if ($NoInstall) {
 Info "Node $(node -v)"
 
 # ---------- 2. Rust 引擎 ----------
-# Windows 上引擎叫 wdsf-live-data.exe；互通文件夹里可能躺着 macOS / Linux 编译的同名文件，
+# Windows 上引擎叫 risk-live-data.exe；互通文件夹里可能躺着 macOS / Linux 编译的同名文件，
 # 那些在这里跑不起来，所以不看文件在不在，直接试运行一次自检来判断。
-$Engine = Join-Path $PSScriptRoot "target\release\wdsf-live-data.exe"
+$Engine = Join-Path $PSScriptRoot "target\release\risk-live-data.exe"
 
 function Test-Engine {
   if (-not (Test-Path -LiteralPath $Engine)) { return $false }
@@ -274,8 +274,8 @@ if (-not (Test-Engine)) {
     Remove-Item -LiteralPath $Engine -Force
   }
   Info "正在构建 Rust 引擎（首次约 2-5 分钟，之后秒开）…"
-  # 只构建引擎；wdsf-probe 依赖 russh/tokio，本地跑网页用不到。
-  & cargo build --release -p wdsf-engine
+  # 只构建引擎；risk-probe 依赖 russh/tokio，本地跑网页用不到。
+  & cargo build --release -p risk-engine
   if ($LASTEXITCODE -ne 0) {
     Fail @"
 编译失败。最常见的原因是 C++ 生成工具装了但当前窗口没刷新到（报错里有 link.exe / cl.exe / MSVC 字样）。
@@ -308,18 +308,18 @@ if (Test-Path -LiteralPath ".env.local") {
   Warn "没有 .env.local，先以演示数据启动。登录后进「规则与设置」页填数据库连接即可切到真实数据。"
 }
 if (-not $env:RISK_PORTAL_KEY) { $env:RISK_PORTAL_KEY = "PONYTAIL-LOCAL-2026" }
-if (-not $env:WDSF_LIVE) { $env:WDSF_LIVE = "0" }
+if (-not $env:GAME_DB_LIVE) { $env:GAME_DB_LIVE = "0" }
 if (-not $env:RISK_PORT) { $env:RISK_PORT = "4173" }
 
 # ---------- 4. 数据源 ----------
-if ($env:WDSF_LIVE -eq "1" -and $env:WDSF_DB_PASSWORD) {
+if ($env:GAME_DB_LIVE -eq "1" -and $env:GAME_DB_PASSWORD) {
   Info "检查数据库连通性…"
   $errFile = [System.IO.Path]::GetTempFileName()
   & $Engine connection-test 1> $null 2> $errFile
   if ($LASTEXITCODE -ne 0) {
     Warn "数据库连不上，先以演示数据启动。错误："
     Get-Content -LiteralPath $errFile | ForEach-Object { Write-Host "    $_" }
-    $env:WDSF_LIVE = "0"
+    $env:GAME_DB_LIVE = "0"
   } else {
     Info "数据库连接正常，核心表可读。"
   }

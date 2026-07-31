@@ -1,4 +1,4 @@
-//! SSH 只读探针。对应 `tools/wdsf_probe.py::ssh_probe`。
+//! SSH 只读探针。对应 `tools/risk_probe.py::ssh_probe`。
 //!
 //! 只执行只读的排查命令（id/ps/ss/stat/find），不改动目标主机。
 
@@ -103,7 +103,7 @@ pub fn checks() -> Vec<(&'static str, &'static str)> {
         ),
         (
             "roots",
-            "for p in /home/gs /opt/wdsf/gs /home/gs/dev_override /data; do [ -e \"$p\" ] && stat -c '%F|%U:%G|%a|%n' \"$p\"; done",
+            "for p in /home/gs /opt/risk/gs /home/gs/dev_override /data; do [ -e \"$p\" ] && stat -c '%F|%U:%G|%a|%n' \"$p\"; done",
         ),
         (
             "top_level",

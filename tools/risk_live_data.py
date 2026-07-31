@@ -26,8 +26,8 @@ def database_identifier(env_name: str, default: str) -> str:
     return value
 
 
-MAIN_DATABASE = database_identifier("WDSF_MDB", "dl_mdb_1")
-LOG_DATABASE = database_identifier("WDSF_LDB", "dl_ldb_1")
+MAIN_DATABASE = database_identifier("GAME_DB_MAIN", "dl_mdb_1")
+LOG_DATABASE = database_identifier("GAME_DB_LOG", "dl_ldb_1")
 
 
 ASSET_TABLES = (
@@ -136,13 +136,13 @@ def database_value(value: str) -> str:
 
 
 def connect():
-    password = os.environ.get("WDSF_DB_PASSWORD", "")
+    password = os.environ.get("GAME_DB_PASSWORD", "")
     if not password:
-        raise RuntimeError("WDSF_DB_PASSWORD is required")
+        raise RuntimeError("GAME_DB_PASSWORD is required")
     return pymysql.connect(
-        host=os.environ.get("WDSF_HOST", "127.0.0.1"),
-        port=int(os.environ.get("WDSF_DB_PORT", "3306")),
-        user=os.environ.get("WDSF_DB_USER", "root"),
+        host=os.environ.get("GAME_DB_HOST", "127.0.0.1"),
+        port=int(os.environ.get("GAME_DB_PORT", "3306")),
+        user=os.environ.get("GAME_DB_USER", "root"),
         password=password,
         charset="latin1",
         autocommit=True,
@@ -1418,7 +1418,7 @@ def connection_test(db) -> dict:
         (MAIN_DATABASE, LOG_DATABASE),
     )["count"]
     if int(tables) < 7:
-        raise RuntimeError("required WDSF tables are missing")
+        raise RuntimeError("required RISK tables are missing")
     return {
         "ok": True,
         "message": "数据库连接成功，核心表可读",

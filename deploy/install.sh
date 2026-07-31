@@ -120,18 +120,18 @@ tar -xzf "$archive" -C "$unpack_dir" --no-same-owner --no-same-permissions
 bundle_root="$unpack_dir/ponytail-risk"
 [ -d "$bundle_root" ] || fail "Release bundle root is missing"
 
-for path in VERSION TARGET_ARCH SHA256SUMS server.mjs public/app.html runtime/bin/node bin/wdsf-live-data bin/wdsf-probe bin/risk-agent lib/librisk_sdk.so; do
+for path in VERSION TARGET_ARCH SHA256SUMS server.mjs public/app.html runtime/bin/node bin/risk-live-data bin/risk-probe bin/risk-agent lib/librisk_sdk.so; do
   [ -e "$bundle_root/$path" ] || fail "Release bundle is missing: $path"
 done
 
 manifest_result="$(cd "$bundle_root" && sha256sum -c SHA256SUMS 2>&1)" || fail "Bundle manifest failed: $manifest_result"
 [ "$(cat "$bundle_root/TARGET_ARCH")" = "x86_64" ] || fail "Unsupported release architecture"
 [ "$(uname -m)" = "x86_64" ] || fail "This release requires Linux x86_64"
-chmod 0755 "$bundle_root/runtime/bin/node" "$bundle_root/bin/wdsf-live-data" "$bundle_root/bin/wdsf-probe" "$bundle_root/bin/risk-agent"
+chmod 0755 "$bundle_root/runtime/bin/node" "$bundle_root/bin/risk-live-data" "$bundle_root/bin/risk-probe" "$bundle_root/bin/risk-agent"
 
 node_major="$($bundle_root/runtime/bin/node -p 'process.versions.node.split(".")[0]')"
 [ "$node_major" -ge 18 ] || fail "Bundled Node.js is older than 18"
-"$bundle_root/bin/wdsf-live-data" self-check >/dev/null
+"$bundle_root/bin/risk-live-data" self-check >/dev/null
 "$bundle_root/bin/risk-agent" self-check >/dev/null
 info "Release bundle verified: $(cat "$bundle_root/VERSION")"
 
@@ -196,7 +196,7 @@ RISK_PORTAL_KEY=$portal_key
 RISK_CONFIG_MASTER_KEY=$config_master_key
 RISK_PORT=$portal_port
 RISK_HOST=$portal_bind
-WDSF_ENGINE=$install_root/current/bin/wdsf-live-data
+RISK_ENGINE=$install_root/current/bin/risk-live-data
 PGR_AGENT_PORT=$agent_port
 PGR_AGENT_LOCAL_TOKEN=$agent_token
 RISK_DB_CONFIG_PATH=$data_root/database-connection.enc.json
@@ -248,7 +248,7 @@ mkdir -p "$release_dir"
 cp -a "$bundle_root/." "$release_dir/"
 ln -s "$data_root" "$release_dir/data"
 chown -R root:root "$release_dir"
-chmod 0755 "$release_dir/runtime/bin/node" "$release_dir/bin/wdsf-live-data" "$release_dir/bin/wdsf-probe" "$release_dir/bin/risk-agent"
+chmod 0755 "$release_dir/runtime/bin/node" "$release_dir/bin/risk-live-data" "$release_dir/bin/risk-probe" "$release_dir/bin/risk-agent"
 
 previous_release=""
 if [ -L "$install_root/current" ]; then previous_release="$(readlink -f "$install_root/current")"; fi

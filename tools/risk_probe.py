@@ -108,7 +108,7 @@ def ssh_probe(args: argparse.Namespace) -> dict:
             "processes": "ps -eo pid,ppid,lstart,cmd | grep -E '[m]agic_Linux32|[m]ysqld'",
             "listeners": "(ss -lntp || netstat -lntp) 2>/dev/null | grep -E ':(3306|6101|8101|8110|8120|8161)[[:space:]]' || true",
             "gs_runtime": "pid=$(pgrep -f 'CONFIG=gs/gs2.ini' | head -n1); printf 'pid=%s\\n' \"$pid\"; [ -n \"$pid\" ] && { readlink -f /proc/$pid/exe; readlink -f /proc/$pid/cwd; tr '\\0' ' ' < /proc/$pid/cmdline; printf '\\n'; }",
-            "roots": "for p in /home/gs /opt/wdsf/gs /home/gs/dev_override /data; do [ -e \"$p\" ] && stat -c '%F|%U:%G|%a|%n' \"$p\"; done",
+            "roots": "for p in /home/gs /opt/risk/gs /home/gs/dev_override /data; do [ -e \"$p\" ] && stat -c '%F|%U:%G|%a|%n' \"$p\"; done",
             "top_level": "find /home/gs -maxdepth 2 -type d -printf '%p\\n' 2>/dev/null | sort | head -n 120",
         }
         return {name: remote_command(client, command) for name, command in checks.items()}
@@ -118,16 +118,16 @@ def ssh_probe(args: argparse.Namespace) -> dict:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--host", default=os.environ.get("WDSF_HOST", "127.0.0.1"))
-    parser.add_argument("--db-port", type=int, default=int(os.environ.get("WDSF_DB_PORT", "3306")))
-    parser.add_argument("--db-user", default=os.environ.get("WDSF_DB_USER", "root"))
-    parser.add_argument("--db-password", default=os.environ.get("WDSF_DB_PASSWORD", ""))
-    parser.add_argument("--ssh-port", type=int, default=int(os.environ.get("WDSF_SSH_PORT", "22")))
-    parser.add_argument("--ssh-user", default=os.environ.get("WDSF_SSH_USER", "root"))
-    parser.add_argument("--ssh-password", default=os.environ.get("WDSF_SSH_PASSWORD", ""))
+    parser.add_argument("--host", default=os.environ.get("GAME_DB_HOST", "127.0.0.1"))
+    parser.add_argument("--db-port", type=int, default=int(os.environ.get("GAME_DB_PORT", "3306")))
+    parser.add_argument("--db-user", default=os.environ.get("GAME_DB_USER", "root"))
+    parser.add_argument("--db-password", default=os.environ.get("GAME_DB_PASSWORD", ""))
+    parser.add_argument("--ssh-port", type=int, default=int(os.environ.get("GAME_SSH_PORT", "22")))
+    parser.add_argument("--ssh-user", default=os.environ.get("GAME_SSH_USER", "root"))
+    parser.add_argument("--ssh-password", default=os.environ.get("GAME_SSH_PASSWORD", ""))
     args = parser.parse_args()
     if not args.db_password or not args.ssh_password:
-        parser.error("set WDSF_DB_PASSWORD and WDSF_SSH_PASSWORD")
+        parser.error("set GAME_DB_PASSWORD and GAME_SSH_PASSWORD")
 
     result = {"host": args.host, "database": db_probe(args), "server": ssh_probe(args)}
     print(json.dumps(result, ensure_ascii=False, indent=2, default=str))

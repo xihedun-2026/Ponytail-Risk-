@@ -9,7 +9,7 @@
 
 项目由 [熙和盾](https://www.xihedun.com/) 开源发布，采用 [MIT License](LICENSE)。
 
-> 当前内置数据适配器面向 其他游戏可以复用 `risk-agent`、C ABI SDK、事件合同和 Web 控制层，并实现自己的只读适配器。
+> 当前内置数据适配器面向私有游戏服务器。其他游戏可以复用 `risk-agent`、C ABI SDK、事件合同和 Web 控制层，并实现自己的只读适配器。
 
 ![Ponytail Risk 风险总览](public/assets/dashboard-preview.png)
 
@@ -96,19 +96,19 @@ node server.mjs
 
 | 产物 | 作用 |
 |---|---|
-| `wdsf-live-data` | 总览、玩家、资产、告警、采集与数据库连接测试 |
-| `wdsf-probe` | 接服前只读检查库表结构、进程和端口 |
+| `risk-live-data` | 总览、玩家、资产、告警、采集与数据库连接测试 |
+| `risk-probe` | 接服前只读检查库表结构、进程和端口 |
 | `risk-agent` | 插件事件接收、持久队列、规则判断和可靠上送 |
 | `risk_sdk.dll` / `librisk_sdk.so` | 游戏插件使用的 C ABI SDK |
 
-`server.mjs` 按 `target/release/`、`target/debug/`、`PATH` 查找引擎，也可通过 `WDSF_ENGINE` 指定路径。
+`server.mjs` 按 `target/release/`、`target/debug/`、`PATH` 查找引擎，也可通过 `RISK_ENGINE` 指定路径。
 
 ## 接入真实数据
 
 推荐顺序：
 
-1. 使用只读数据库账号运行 `wdsf-probe`，确认目标库表与字段。
-2. 开启 `WDSF_LIVE=1`，先在 shadow 模式观察并校准阈值。
+1. 使用只读数据库账号运行 `risk-probe`，确认目标库表与字段。
+2. 开启 `GAME_DB_LIVE=1`，先在 shadow 模式观察并校准阈值。
 3. 在币值、道具、奖励和交易的真实提交点接入 SDK 事件。
 4. 对账数据库历史与插件实时事件，确认无丢失、重复或所有权断链。
 5. 最后才启用人工处置命令拉取与回执。
@@ -158,9 +158,9 @@ crates/
   risk-ledger/     本地资产账本
   risk-agent/      插件实时事件与可靠队列
   risk-sdk/        C ABI SDK
-  wdsf-adapter/    WDSF 只读数据库适配
-  wdsf-engine/     数据引擎 CLI
-  wdsf-probe/      接服前只读探针
+  risk-adapter/    游戏数据库只读适配
+  risk-engine/     数据引擎 CLI
+  risk-probe/      接服前只读探针
 public/            Web 控制台
 deploy/            Linux 签名发布包与安装器
 docs/              部署、安全和插件协议

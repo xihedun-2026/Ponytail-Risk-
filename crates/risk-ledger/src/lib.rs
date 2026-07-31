@@ -1,6 +1,6 @@
 //! 本地资产快照账本（SQLite）。
 //!
-//! 对应 `tools/wdsf_live_data.py` 的 `prepare_ledger` / `apply_snapshot` / `ledger_events`。
+//! 对应 `tools/risk_live_data.py` 的 `prepare_ledger` / `apply_snapshot` / `ledger_events`。
 //!
 //! 重要语义（交接报告 §4 限制 4、README）：这是**轮询快照**账本，不是游戏内的
 //! 精确事件流。`first_seen` 只说明「两次扫描之间进入了当前持有表」，

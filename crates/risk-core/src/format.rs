@@ -1,4 +1,4 @@
-//! 展示层格式化。行为与 `tools/wdsf_live_data.py` 的 `number` / `stamp_label` 逐字对齐。
+//! 展示层格式化。行为与 `tools/risk_live_data.py` 的 `number` / `stamp_label` 逐字对齐。
 
 /// 等价于 Python `f"{int(value or 0):,}"`。
 pub fn number(value: i64) -> String {
@@ -86,7 +86,7 @@ mod tests {
     }
 
     #[test]
-    fn stamp_label_formats_wdsf_timestamps() {
+    fn stamp_label_formats_risk_timestamps() {
         assert_eq!(stamp_label("20260101000000"), "01-01 00:00:00");
         assert_eq!(stamp_label("20260730142108"), "07-30 14:21:08");
         assert_eq!(stamp_label(""), "未知时间");

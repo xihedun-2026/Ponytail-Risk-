@@ -5,9 +5,9 @@ members = [
     "crates/risk-core",
     "crates/risk-ledger",
     "crates/risk-sdk",
-    "crates/wdsf-adapter",
-    "crates/wdsf-engine",
-    "crates/wdsf-probe",
+    "crates/risk-adapter",
+    "crates/risk-engine",
+    "crates/risk-probe",
 ]
 
 [workspace.package]

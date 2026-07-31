@@ -47,13 +47,13 @@ const aiEncryptionKey = configMasterKey ? createHmac("sha256", configMasterKey).
 const legacyConnectionEncryptionKey = createHash("sha256").update(`ponytail-risk-db:${portalKey}`).digest();
 const legacyAiEncryptionKey = createHash("sha256").update(`ponytail-risk-ai:${portalKey}`).digest();
 const defaultDatabaseConfig = {
-  enabled: process.env.WDSF_LIVE === "1",
-  host: process.env.WDSF_HOST || "127.0.0.1",
-  port: Number(process.env.WDSF_DB_PORT || 3306),
-  user: process.env.WDSF_DB_USER || "",
-  password: process.env.WDSF_DB_PASSWORD || "",
-  mainDatabase: process.env.WDSF_MDB || "dl_mdb_1",
-  logDatabase: process.env.WDSF_LDB || "dl_ldb_1",
+  enabled: process.env.GAME_DB_LIVE === "1",
+  host: process.env.GAME_DB_HOST || "127.0.0.1",
+  port: Number(process.env.GAME_DB_PORT || 3306),
+  user: process.env.GAME_DB_USER || "",
+  password: process.env.GAME_DB_PASSWORD || "",
+  mainDatabase: process.env.GAME_DB_MAIN || "dl_mdb_1",
+  logDatabase: process.env.GAME_DB_LOG || "dl_ldb_1",
 };
 const defaultAiConfig = {
   enabled: false,
@@ -91,7 +91,7 @@ const players = [
     id: "1003281",
     name: "北境长歌",
     account: "acc_88241",
-    server: "问道一区",
+    server: "示例一区",
     level: 142,
     score: 87,
     status: "高风险",
@@ -115,7 +115,7 @@ const players = [
     id: "1007742",
     name: "山海一梦",
     account: "acc_19207",
-    server: "问道二区",
+    server: "示例二区",
     level: 131,
     score: 38,
     status: "观察",
@@ -1057,13 +1057,13 @@ function publicDatabaseConfig() {
 function databaseEnvironment(config = databaseConfig, caps = gameplayCaps) {
   return {
     ...process.env,
-    WDSF_LIVE: config.enabled ? "1" : "0",
-    WDSF_HOST: config.host,
-    WDSF_DB_PORT: String(config.port),
-    WDSF_DB_USER: config.user,
-    WDSF_DB_PASSWORD: config.password,
-    WDSF_MDB: config.mainDatabase,
-    WDSF_LDB: config.logDatabase,
+    GAME_DB_LIVE: config.enabled ? "1" : "0",
+    GAME_DB_HOST: config.host,
+    GAME_DB_PORT: String(config.port),
+    GAME_DB_USER: config.user,
+    GAME_DB_PASSWORD: config.password,
+    GAME_DB_MAIN: config.mainDatabase,
+    GAME_DB_LOG: config.logDatabase,
     RISK_GAMEPLAY_CAPS_JSON: JSON.stringify(caps.filter((cap) => cap.enabled)),
   };
 }
@@ -1145,11 +1145,11 @@ function dashboard() {
   };
 }
 
-// 数据层已从 Python 迁移到 Rust（crates/wdsf-engine）。
-// 二进制路径可用 WDSF_ENGINE 覆盖；默认找 cargo 的 release 产物，其次 debug。
+// 数据层已从 Python 迁移到 Rust（crates/risk-engine）。
+// 二进制路径可用 RISK_ENGINE 覆盖；默认找 cargo 的 release 产物，其次 debug。
 function engineBinary() {
-  if (process.env.WDSF_ENGINE) return process.env.WDSF_ENGINE;
-  const name = process.platform === "win32" ? "wdsf-live-data.exe" : "wdsf-live-data";
+  if (process.env.RISK_ENGINE) return process.env.RISK_ENGINE;
+  const name = process.platform === "win32" ? "risk-live-data.exe" : "risk-live-data";
   for (const profile of ["release", "debug"]) {
     const candidate = join(projectRoot, "target", profile, name);
     if (existsSync(candidate)) return candidate;
@@ -1172,7 +1172,7 @@ async function liveData(operation, query = "", config = databaseConfig, caps = g
       windowsHide: true,
       maxBuffer: 2 * 1024 * 1024,
     });
-    if (process.env.WDSF_QUERY_TRACE === "1" && stderr.trim()) console.error(stderr.trim());
+    if (process.env.GAME_DB_QUERY_TRACE === "1" && stderr.trim()) console.error(stderr.trim());
     const result = JSON.parse(stdout);
     if (result.error) {
       const error = new Error(result.error);
@@ -1209,9 +1209,9 @@ async function liveData(operation, query = "", config = databaseConfig, caps = g
     } else if (error.signal) {
       reason = `引擎被信号 ${error.signal} 终止（${seconds} 秒；二进制架构不符或被系统安全策略拦截时会这样）`;
     } else if (error.code === "ENOENT") {
-      reason = `找不到引擎二进制 ${engineBinary()}，请先 cargo build --release -p wdsf-engine`;
+      reason = `找不到引擎二进制 ${engineBinary()}，请先 cargo build --release -p risk-engine`;
     } else if (error.code === "ENOEXEC" || error.code === "EBADARCH") {
-      reason = `引擎二进制不是本机架构（${error.code}），请在本机重新 cargo build --release -p wdsf-engine`;
+      reason = `引擎二进制不是本机架构（${error.code}），请在本机重新 cargo build --release -p risk-engine`;
     } else if (typeof error.code === "number" && error.code !== 0) {
       reason = `引擎退出码 ${error.code}（${seconds} 秒）`;
     }

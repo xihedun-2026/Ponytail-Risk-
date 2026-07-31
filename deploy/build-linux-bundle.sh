@@ -64,10 +64,10 @@ installer_name="ponytail-risk-install.sh"
 printf '==> Building Rust release binaries\n'
 build_target_dir="$root/target/linux-x86_64"
 cargo_release_dir="$build_target_dir/release"
-CARGO_TARGET_DIR="$build_target_dir" cargo build --locked --release -p wdsf-engine -p wdsf-probe -p risk-agent -p risk-sdk
-"$cargo_release_dir/wdsf-live-data" self-check >/dev/null
+CARGO_TARGET_DIR="$build_target_dir" cargo build --locked --release -p risk-engine -p risk-probe -p risk-agent -p risk-sdk
+"$cargo_release_dir/risk-live-data" self-check >/dev/null
 "$cargo_release_dir/risk-agent" self-check >/dev/null
-WDSF_ENGINE="$cargo_release_dir/wdsf-live-data" "$node_bin" self_check.mjs >/dev/null
+RISK_ENGINE="$cargo_release_dir/risk-live-data" "$node_bin" self_check.mjs >/dev/null
 
 work_dir="$(mktemp -d /tmp/ponytail-risk-build.XXXXXX)"
 cleanup() { rm -rf -- "$work_dir"; }
@@ -80,7 +80,7 @@ cp public/app.html public/app.js public/home.js public/index.html public/styles.
 cp public/assets/dashboard-preview.png "$bundle_root/public/assets/"
 cp public/vendor/lucide-0.468.0.min.js "$bundle_root/public/vendor/"
 cp docs/GAME_PLUGIN_INTEGRATION_V1.md docs/plugin-event-batch.v1.schema.json docs/plugin-event-batch.v1.example.json docs/SECURITY_AND_LICENSING.md "$bundle_root/docs/"
-cp "$cargo_release_dir/wdsf-live-data" "$cargo_release_dir/wdsf-probe" "$cargo_release_dir/risk-agent" "$bundle_root/bin/"
+cp "$cargo_release_dir/risk-live-data" "$cargo_release_dir/risk-probe" "$cargo_release_dir/risk-agent" "$bundle_root/bin/"
 cp "$cargo_release_dir/librisk_sdk.so" "$bundle_root/lib/"
 cp crates/risk-sdk/include/ponytail_risk_sdk.h "$bundle_root/include/"
 cp "$node_bin" "$bundle_root/runtime/bin/node"

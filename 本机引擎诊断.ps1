@@ -2,7 +2,7 @@
 #   powershell -ExecutionPolicy Bypass -File .\本机引擎诊断.ps1
 #
 # 用来分清「总览一直转圈 / 实时数据源不可用」到底是哪一种：
-#   A. 没有本机编译的 wdsf-live-data.exe            → 跑 start-local.ps1 编译
+#   A. 没有本机编译的 risk-live-data.exe            → 跑 start-local.ps1 编译
 #   B. 引擎起不来（架构不符 / 被安全软件拦截）      → 重新编译或放行
 #   C. 引擎能跑，但 dashboard 太慢撞上 180 秒超时    → 需要批量查询优化
 # 只做只读查询，不改数据库、不打印密码。
@@ -11,7 +11,7 @@ if (Test-Path variable:PSNativeCommandUseErrorActionPreference) {
   $PSNativeCommandUseErrorActionPreference = $false
 }
 Set-Location -LiteralPath $PSScriptRoot
-$Engine = Join-Path $PSScriptRoot "target\release\wdsf-live-data.exe"
+$Engine = Join-Path $PSScriptRoot "target\release\risk-live-data.exe"
 
 Write-Host "=== 1. 引擎二进制 ==="
 if (-not (Test-Path -LiteralPath $Engine)) {
@@ -27,7 +27,7 @@ if ($LASTEXITCODE -eq 0) {
   Write-Host "OK：引擎可以在本机执行"
 } else {
   Write-Host "失败：退出码 $LASTEXITCODE"
-  Write-Host "→ 多半是别的系统编译的二进制，或被杀毒软件拦了。解决：删掉 target\release\wdsf-live-data.exe 后重跑 start-local.ps1。"
+  Write-Host "→ 多半是别的系统编译的二进制，或被杀毒软件拦了。解决：删掉 target\release\risk-live-data.exe 后重跑 start-local.ps1。"
   exit 1
 }
 

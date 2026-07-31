@@ -17,7 +17,7 @@ const projectRoot = fileURLToPath(new URL(".", import.meta.url));
 
 const port = Number(process.env.BRIDGE_CHECK_PORT || 4179);
 const base = `http://127.0.0.1:${port}`;
-const workDir = mkdtempSync(join(tmpdir(), "wdsf-bridge-"));
+const workDir = mkdtempSync(join(tmpdir(), "risk-bridge-"));
 const argvLog = join(workDir, "argv.log");
 const fakeEngine = join(workDir, "fake-engine.cjs");
 
@@ -28,7 +28,7 @@ const { basename } = require("node:path");
 const operation = basename(process.argv[1] || "");
 if (["dashboard", "player", "asset-search", "alerts"].includes(operation)) {
   appendFileSync(${JSON.stringify(argvLog)}, \`ARGS \${[operation, ...process.argv.slice(2)].join(" ")}\\n\`);
-  appendFileSync(${JSON.stringify(argvLog)}, \`ENV \${process.env.WDSF_HOST}|\${process.env.WDSF_MDB}|\${process.env.WDSF_DB_USER}\\n\`);
+  appendFileSync(${JSON.stringify(argvLog)}, \`ENV \${process.env.GAME_DB_HOST}|\${process.env.GAME_DB_MAIN}|\${process.env.GAME_DB_USER}\\n\`);
   if (operation === "player") {
     console.log('{"error":"未找到匹配玩家"}');
     process.exit(2);
@@ -55,13 +55,13 @@ const child = spawn(process.execPath, ["server.mjs"], {
     RISK_PORT: String(port),
     RISK_PORTAL_KEY: "bridge-check-key",
     RISK_DB_CONFIG_PATH: join(workDir, "cfg.json"),
-    WDSF_LIVE: "1",
-    WDSF_HOST: "10.9.8.7",
-    WDSF_DB_USER: "reader",
-    WDSF_DB_PASSWORD: "pw",
-    WDSF_MDB: "main_db",
-    WDSF_LDB: "log_db",
-    WDSF_ENGINE: process.execPath,
+    GAME_DB_LIVE: "1",
+    GAME_DB_HOST: "10.9.8.7",
+    GAME_DB_USER: "reader",
+    GAME_DB_PASSWORD: "pw",
+    GAME_DB_MAIN: "main_db",
+    GAME_DB_LOG: "log_db",
+    RISK_ENGINE: process.execPath,
     NODE_OPTIONS: `${process.env.NODE_OPTIONS || ""} --require=${fakeEngine}`.trim(),
     // 拉长采集间隔，避免后台采集干扰断言。
     RISK_COLLECT_INTERVAL_MS: "600000",

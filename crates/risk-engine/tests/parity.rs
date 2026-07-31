@@ -21,7 +21,7 @@ use risk_core::{
 use risk_ledger::{apply_snapshot, prepare_ledger, AssetRow};
 
 fn project_root() -> PathBuf {
-    // CARGO_MANIFEST_DIR = <root>/crates/wdsf-engine
+    // CARGO_MANIFEST_DIR = <root>/crates/risk-engine
     Path::new(env!("CARGO_MANIFEST_DIR"))
         .parent()
         .and_then(Path::parent)

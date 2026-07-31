@@ -57,13 +57,13 @@ $rng.Dispose()
 | `RISK_CONFIG_MASTER_KEY` | 生产必需 | 64 个十六进制字符，用于 AES-GCM 配置加密 |
 | `RISK_HOST` | 否 | 默认 `127.0.0.1` |
 | `RISK_PORT` | 否 | 默认 `4173` |
-| `WDSF_ENGINE` | 否 | 数据引擎绝对路径 |
-| `WDSF_LIVE` | 实时模式必需 | 设置为 `1` |
-| `WDSF_HOST` | 实时模式必需 | 游戏数据库地址 |
-| `WDSF_DB_PORT` | 否 | 默认 `3306` |
-| `WDSF_DB_USER` | 实时模式必需 | 只读账号 |
-| `WDSF_DB_PASSWORD` | 实时模式必需 | 只从环境读取 |
-| `WDSF_MDB` / `WDSF_LDB` | 实时模式必需 | 主库与日志库名 |
+| `RISK_ENGINE` | 否 | 数据引擎绝对路径 |
+| `GAME_DB_LIVE` | 实时模式必需 | 设置为 `1` |
+| `GAME_DB_HOST` | 实时模式必需 | 游戏数据库地址 |
+| `GAME_DB_PORT` | 否 | 默认 `3306` |
+| `GAME_DB_USER` | 实时模式必需 | 只读账号 |
+| `GAME_DB_PASSWORD` | 实时模式必需 | 只从环境读取 |
+| `GAME_DB_MAIN` / `GAME_DB_LOG` | 实时模式必需 | 主库与日志库名 |
 
 `.env.local` 和 `data/` 已被 Git 忽略。不要把凭据放进脚本、README、命令历史或截图。
 
@@ -83,13 +83,13 @@ flush privileges;
 运行只读探针：
 
 ```bash
-cargo run --release -p wdsf-probe -- \
-  --host "$WDSF_HOST" \
-  --mdb "$WDSF_MDB" \
-  --ldb "$WDSF_LDB"
+cargo run --release -p risk-probe -- \
+  --host "$GAME_DB_HOST" \
+  --mdb "$GAME_DB_MAIN" \
+  --ldb "$GAME_DB_LOG"
 ```
 
-探针通过后设置 `WDSF_LIVE=1` 启动 Portal。保持 shadow 模式，先检查数据覆盖率、编码、规则证据和查询耗时；数据库不可用时，API 会明确返回数据源错误，不以演示数据冒充实服结果。
+探针通过后设置 `GAME_DB_LIVE=1` 启动 Portal。保持 shadow 模式，先检查数据覆盖率、编码、规则证据和查询耗时；数据库不可用时，API 会明确返回数据源错误，不以演示数据冒充实服结果。
 
 ## 5. 插件 Agent 与 SDK
 

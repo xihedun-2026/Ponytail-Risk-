@@ -1,4 +1,4 @@
-//! `wdsf-probe`：WDSF 环境只读探针，`tools/wdsf_probe.py` 的 drop-in 替代。
+//! `risk-probe`：RISK 环境只读探针，`tools/risk_probe.py` 的 drop-in 替代。
 //!
 //! 用途是接入新服前摸清库表结构与进程/端口现状。全部操作只读，
 //! 凭据只从命令行或进程环境传入，不写入源码，也不回显到输出里。
@@ -21,21 +21,21 @@ const SIGNALS: [&str; 14] = [
 ];
 
 #[derive(Parser, Debug)]
-#[command(name = "wdsf-probe", about = "WDSF 环境只读探针")]
+#[command(name = "risk-probe", about = "RISK 环境只读探针")]
 struct Cli {
-    #[arg(long, env = "WDSF_HOST", default_value = "127.0.0.1")]
+    #[arg(long, env = "GAME_DB_HOST", default_value = "127.0.0.1")]
     host: String,
-    #[arg(long = "db-port", env = "WDSF_DB_PORT", default_value_t = 3306)]
+    #[arg(long = "db-port", env = "GAME_DB_PORT", default_value_t = 3306)]
     db_port: u16,
-    #[arg(long = "db-user", env = "WDSF_DB_USER", default_value = "root")]
+    #[arg(long = "db-user", env = "GAME_DB_USER", default_value = "root")]
     db_user: String,
-    #[arg(long = "db-password", env = "WDSF_DB_PASSWORD", default_value = "")]
+    #[arg(long = "db-password", env = "GAME_DB_PASSWORD", default_value = "")]
     db_password: String,
-    #[arg(long = "ssh-port", env = "WDSF_SSH_PORT", default_value_t = 22)]
+    #[arg(long = "ssh-port", env = "GAME_SSH_PORT", default_value_t = 22)]
     ssh_port: u16,
-    #[arg(long = "ssh-user", env = "WDSF_SSH_USER", default_value = "root")]
+    #[arg(long = "ssh-user", env = "GAME_SSH_USER", default_value = "root")]
     ssh_user: String,
-    #[arg(long = "ssh-password", env = "WDSF_SSH_PASSWORD", default_value = "")]
+    #[arg(long = "ssh-password", env = "GAME_SSH_PASSWORD", default_value = "")]
     ssh_password: String,
 }
 
@@ -147,7 +147,7 @@ async fn ssh_probe(cli: &Cli) -> Result<Value> {
 async fn main() -> Result<()> {
     let cli = Cli::parse();
     if cli.db_password.is_empty() || cli.ssh_password.is_empty() {
-        bail!("set WDSF_DB_PASSWORD and WDSF_SSH_PASSWORD");
+        bail!("set GAME_DB_PASSWORD and GAME_SSH_PASSWORD");
     }
 
     let database = db_probe(&cli)?;
@@ -189,7 +189,7 @@ mod tests {
 
     #[test]
     fn cli_requires_both_passwords() {
-        let cli = Cli::try_parse_from(["wdsf-probe"]).unwrap();
+        let cli = Cli::try_parse_from(["risk-probe"]).unwrap();
         // 默认不带密码，main 会据此报错退出。
         assert!(cli.db_password.is_empty());
         assert!(cli.ssh_password.is_empty());
@@ -201,7 +201,7 @@ mod tests {
     #[test]
     fn cli_accepts_explicit_flags() {
         let cli = Cli::try_parse_from([
-            "wdsf-probe",
+            "risk-probe",
             "--host",
             "10.0.0.5",
             "--db-port",

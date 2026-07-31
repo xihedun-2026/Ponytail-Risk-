@@ -2335,7 +2335,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "wdsf-adapter"
+name = "risk-adapter"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -2350,7 +2350,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "wdsf-engine"
+name = "risk-engine"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -2360,11 +2360,11 @@ dependencies = [
  "risk-ledger",
  "rusqlite",
  "serde_json",
- "wdsf-adapter",
+ "risk-adapter",
 ]
 
 [[package]]
-name = "wdsf-probe"
+name = "risk-probe"
 version = "0.1.0"
 dependencies = [
  "anyhow",
