@@ -23,6 +23,14 @@
 
 ![玩家行为分析](docs/images/player-analysis.png)
 
+规则页集中管理实时数据源、AI Provider、玩法产出上限和确定性检测规则：
+
+![规则与设置](docs/images/rules-settings.png)
+
+插件页提供本机 Agent、远程 SDK 凭据、C ABI 接口和事件合同：
+
+![插件接入](docs/images/plugin-integration.png)
+
 ## 核心能力
 
 - **风险总览**：全服事件、风险玩家、暂存资产、规则命中和趋势聚合。
