@@ -9,7 +9,7 @@
 
 项目由 [熙和盾](https://www.xihedun.com/) 开源发布，采用 [MIT License](LICENSE)。
 
-> 当前内置数据适配器面向 WDSF/问道类库表。其他游戏可以复用 `risk-agent`、C ABI SDK、事件合同和 Web 控制层，并实现自己的只读适配器。
+> 当前内置数据适配器面向 其他游戏可以复用 `risk-agent`、C ABI SDK、事件合同和 Web 控制层，并实现自己的只读适配器。
 
 ![Ponytail Risk 风险总览](public/assets/dashboard-preview.png)
 
