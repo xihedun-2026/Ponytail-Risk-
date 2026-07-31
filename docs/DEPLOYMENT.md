@@ -7,7 +7,7 @@
 | 组件 | 最低版本 | 用途 |
 |---|---:|---|
 | Node.js | 18 | Web 控制层，无 npm 依赖 |
-| Rust | 1.82 | 构建数据引擎、Agent 和 SDK |
+| Rust | 1.88 | 构建数据引擎、Agent 和 SDK |
 | Python | 3.10 | 仅用于差分测试和旧工具基线 |
 | C/C++ 构建工具 | 平台当前稳定版 | `rusqlite bundled` 和 C ABI 检查 |
 

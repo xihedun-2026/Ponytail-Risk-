@@ -4,7 +4,7 @@
 
 ## 开发环境
 
-- Rust 1.82+
+- Rust 1.88+
 - Node.js 18+
 - Python 3.10+（仅用于 Rust/Python 差分测试）
 

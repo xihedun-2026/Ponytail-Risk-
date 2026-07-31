@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/xihedun-2026/Ponytail-Risk-/actions/workflows/ci.yml/badge.svg)](https://github.com/xihedun-2026/Ponytail-Risk-/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![Rust 1.82+](https://img.shields.io/badge/Rust-1.82%2B-orange.svg)](https://www.rust-lang.org/)
+[![Rust 1.88+](https://img.shields.io/badge/Rust-1.88%2B-orange.svg)](https://www.rust-lang.org/)
 [![Node 18+](https://img.shields.io/badge/Node.js-18%2B-43853d.svg)](https://nodejs.org/)
 
 面向私有游戏服务器的开源行为风控与证据复核平台。它把只读数据库分析、游戏插件实时事件、资产链路、规则评分和 AI 辅助研判放进同一个控制台，并明确保留人工处置边界。
@@ -72,7 +72,7 @@ powershell -ExecutionPolicy Bypass -File .\start-local.ps1 -NoInstall
 
 ### Linux / macOS
 
-先安装 Node.js 18+ 和 Rust 1.82+，然后运行：
+先安装 Node.js 18+ 和 Rust 1.88+，然后运行：
 
 ```bash
 chmod +x start-local.sh
