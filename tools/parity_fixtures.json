@@ -1,0 +1,212 @@
+{
+  "_comment": "Python 与 Rust 风控实现的差分验证语料。交接报告 §7 阶段 4 要求两侧对同一 fixture 输出相同标签、证据字段和基础分后才能切换。新增规则时同步在这里补一组 fixture。",
+  "risk_score": [
+    { "name": "空证据", "facts": {} },
+    { "name": "正常角色", "facts": { "gold_coin": 1000, "median_gold_coin": 1000 } },
+    { "name": "币值异常一次", "facts": { "abnormal_coin": 1 } },
+    { "name": "币值异常两次", "facts": { "abnormal_coin": 2 } },
+    { "name": "币值异常触顶", "facts": { "abnormal_coin": 100 } },
+    { "name": "元宝到下限未到倍数", "facts": { "gold_coin": 100000000, "median_gold_coin": 50000000 } },
+    { "name": "元宝到倍数未到下限", "facts": { "gold_coin": 80000000, "median_gold_coin": 1000000 } },
+    { "name": "元宝两者都满足", "facts": { "gold_coin": 100000000, "median_gold_coin": 10000000 } },
+    { "name": "中位数为零", "facts": { "gold_coin": 100000000, "median_gold_coin": 0 } },
+    { "name": "账本缺腿", "facts": { "unpaired_transfers": 1 } },
+    { "name": "同设备交易", "facts": { "same_device_peers": 3 } },
+    { "name": "归集来源边界下", "facts": { "funnel_source_peers": 3, "funnel_asset_rows": 100 } },
+    { "name": "归集笔数边界下", "facts": { "funnel_source_peers": 100, "funnel_asset_rows": 7 } },
+    { "name": "多账号资产归集", "facts": { "funnel_source_peers": 4, "funnel_asset_rows": 8 } },
+    { "name": "短时归集来源边界下", "facts": { "burst_funnel_source_peers": 3, "burst_funnel_asset_rows": 100 } },
+    { "name": "短时归集笔数边界下", "facts": { "burst_funnel_source_peers": 100, "burst_funnel_asset_rows": 7 } },
+    { "name": "短时资产归集", "facts": { "burst_funnel_source_peers": 4, "burst_funnel_asset_rows": 8 } },
+    { "name": "短时归集不重复计分", "facts": { "funnel_source_peers": 4, "funnel_asset_rows": 8, "burst_funnel_source_peers": 4, "burst_funnel_asset_rows": 8 } },
+    { "name": "回流资产边界下", "facts": { "returned_asset_ids": 2, "returned_asset_peers": 1 } },
+    { "name": "资产循环回流", "facts": { "returned_asset_ids": 3, "returned_asset_peers": 1 } },
+    { "name": "超长活跃天数不足", "facts": { "long_active_days": 1, "max_daily_active_span_minutes": 1080, "max_daily_active_events": 100 } },
+    { "name": "超长活跃事件不足", "facts": { "long_active_days": 2, "max_daily_active_span_minutes": 1080, "max_daily_active_events": 99 } },
+    { "name": "超长持续活跃", "facts": { "long_active_days": 2, "max_daily_active_span_minutes": 1080, "max_daily_active_events": 100 } },
+    { "name": "机械周期重复率不足", "facts": { "mechanical_action": "user:start_combat", "mechanical_action_events": 20, "mechanical_interval_seconds": 300, "mechanical_interval_ratio_permille": 799, "mechanical_span_minutes": 30 } },
+    { "name": "机械周期行为", "facts": { "mechanical_action": "user:start_combat", "mechanical_action_events": 20, "mechanical_interval_seconds": 300, "mechanical_interval_ratio_permille": 800, "mechanical_span_minutes": 30 } },
+    { "name": "奖励爆发边界下", "facts": { "reward_burst_action": "huilcbjl", "reward_burst_events": 9 } },
+    { "name": "奖励爆发异常", "facts": { "reward_burst_action": "huilcbjl", "reward_burst_events": 10 } },
+    { "name": "玩法上限恰好达到", "facts": { "configured_cap_action": "huilcbjl", "configured_cap_daily_events": 100, "configured_cap_daily_limit": 100, "configured_cap_burst_events": 10, "configured_cap_burst_limit": 10 } },
+    { "name": "玩法单日产出超限", "facts": { "configured_cap_action": "huilcbjl", "configured_cap_daily_events": 101, "configured_cap_daily_limit": 100, "configured_cap_burst_events": 9, "configured_cap_burst_limit": 10 } },
+    { "name": "玩法短时产出超限", "facts": { "configured_cap_action": "custom_reward", "configured_cap_daily_events": 20, "configured_cap_daily_limit": 100, "configured_cap_burst_events": 6, "configured_cap_burst_limit": 5 } },
+    { "name": "奖励快速归集天数不足", "facts": { "rapid_reward_outflows": 5, "rapid_reward_outflow_days": 2, "reward_outflow_target_peers": 1 } },
+    { "name": "奖励快速归集目标分散", "facts": { "rapid_reward_outflows": 5, "rapid_reward_outflow_days": 3, "reward_outflow_target_peers": 3 } },
+    { "name": "奖励快速归集", "facts": { "rapid_reward_outflows": 5, "rapid_reward_outflow_days": 3, "reward_outflow_target_peers": 2 } },
+    { "name": "设备网络证据不单独评分", "facts": { "shared_device_accounts": 100, "shared_ip_accounts": 100 } },
+    { "name": "丢弃拾取绕过交易", "facts": { "ground_handoffs": 1 } },
+    { "name": "元宝跳增单次", "facts": { "unexplained_gold_increase": 5000000, "unexplained_gold_jumps": 1 } },
+    { "name": "元宝跳增多次", "facts": { "unexplained_gold_increase": 5000000, "unexplained_gold_jumps": 2 } },
+    { "name": "元宝跳增触顶", "facts": { "unexplained_gold_increase": 1, "unexplained_gold_jumps": 50 } },
+    { "name": "高频流转边界下", "facts": { "transfer_count": 19 } },
+    { "name": "高频流转边界上", "facts": { "transfer_count": 20 } },
+    {
+      "name": "综合可疑",
+      "facts": { "gold_coin": 900000000, "median_gold_coin": 10000000, "abnormal_coin": 2, "unpaired_transfers": 1 }
+    },
+    {
+      "name": "全部命中触顶",
+      "facts": {
+        "abnormal_coin": 100,
+        "gold_coin": 900000000,
+        "median_gold_coin": 1,
+        "unpaired_transfers": 1,
+        "same_device_peers": 1,
+        "ground_handoffs": 1,
+        "unexplained_gold_increase": 1,
+        "unexplained_gold_jumps": 50,
+        "transfer_count": 100
+      }
+    }
+  ],
+  "number": [0, 1, 999, 1000, 9582200, 1000000000, -1234, -1000000],
+  "stamp_label": ["20260101000000", "20260730142108", "", "not-a-stamp", "2026010100000x", "1234567890123"],
+  "normalized_iid": [":6a617f69000102542fd9:", "  :a1:  ", "", "::", "AbCdEf", ":mixed:Case:"],
+  "reward_change": [
+    { "bonus_type": 7, "bonus_name": "9582200", "bonus_prop": "" },
+    { "bonus_type": 1, "bonus_name": "玄天令", "bonus_prop": "" },
+    { "bonus_type": 14, "bonus_name": "雷极兽", "bonus_prop": "" },
+    { "bonus_type": 2, "bonus_name": "", "bonus_prop": "副本" },
+    { "bonus_type": 3, "bonus_name": "", "bonus_prop": "" },
+    { "bonus_type": 99, "bonus_name": "123", "bonus_prop": "" },
+    { "bonus_type": 7, "bonus_name": "", "bonus_prop": "8000" }
+  ],
+  "activity_direction": ["huilcbjl", "jinn", "guaiwgc", "shoujrz", "yuancxl", "shouszh", "", "unknown_action"],
+  "gold_snapshot_jumps": [
+    {
+      "name": "低于阈值",
+      "rows": [
+        { "update_time": "20260101000000", "gold_coin": 10 },
+        { "update_time": "20260101000100", "gold_coin": 1000009 },
+        { "update_time": "20260101000200", "gold_coin": 1000010 }
+      ]
+    },
+    {
+      "name": "恰好达到阈值",
+      "rows": [
+        { "update_time": "20260101000000", "gold_coin": 10 },
+        { "update_time": "20260101000100", "gold_coin": 1000010 }
+      ]
+    },
+    {
+      "name": "多次跳增含下跌",
+      "rows": [
+        { "update_time": "20260101000000", "gold_coin": 0 },
+        { "update_time": "20260101000100", "gold_coin": 5000000 },
+        { "update_time": "20260101000200", "gold_coin": 100 },
+        { "update_time": "20260101000300", "gold_coin": 9000000 }
+      ]
+    },
+    { "name": "空输入", "rows": [] },
+    { "name": "单点", "rows": [{ "update_time": "20260101000000", "gold_coin": 1 }] }
+  ],
+  "transfer_timeline_event": [
+    {
+      "name": "丢弃方视角",
+      "gid": "p1",
+      "row": { "action": "diuqsq", "item_amount": 1, "item_name": "测试道具", "item_iid": ":A1:", "gid_from": "p1", "gid_to": "(undefined)" }
+    },
+    {
+      "name": "拾取方视角",
+      "gid": "p2",
+      "row": { "action": "diuqsq", "item_amount": 1, "item_name": "测试道具", "item_iid": ":A1:", "gid_from": "p1", "gid_to": "p2" }
+    },
+    {
+      "name": "拾取行对原持有人",
+      "gid": "p1",
+      "row": { "action": "diuqsq", "item_amount": 1, "item_name": "测试道具", "item_iid": ":A1:", "gid_from": "p1", "gid_to": "p2" }
+    },
+    {
+      "name": "摆摊道具腿收取",
+      "gid": "p2",
+      "row": { "action": "bait", "item_amount": 3, "item_name": "玄天令", "item_iid": ":B1:", "gid_from": "p1", "gid_to": "p2" }
+    },
+    {
+      "name": "摆摊金钱腿付款",
+      "gid": "p1",
+      "row": { "action": "bait", "item_amount": 3, "item_name": "玄天令", "item_iid": "", "gid_from": "p1", "gid_to": "p2" }
+    },
+    {
+      "name": "玩家交易转出",
+      "gid": "p1",
+      "row": { "action": "jiaoy", "item_amount": 2, "item_name": "雷极弧光", "item_iid": ":C1:", "gid_from": "p1", "gid_to": "p2" }
+    },
+    {
+      "name": "未知动作转移",
+      "gid": "p2",
+      "row": { "action": "qita", "item_amount": 5, "item_name": "", "item_iid": "", "gid_from": "p1", "gid_to": "p2" }
+    }
+  ],
+  "transfer_trace_action": [
+    { "action": "diuqsq", "gid_from": "p1", "gid_to": "p2" },
+    { "action": "diuqsq", "gid_from": "p1", "gid_to": "(undefined)" },
+    { "action": "diuqsq", "gid_from": "p1", "gid_to": "" },
+    { "action": "bait", "gid_from": "p1", "gid_to": "p2" },
+    { "action": "jiaoy", "gid_from": "p1", "gid_to": "p2" },
+    { "action": "qita", "gid_from": "p1", "gid_to": "p2" }
+  ],
+  "apply_snapshot": [
+    {
+      "name": "基线-变更-消失",
+      "scans": [
+        {
+          "scanned_at": "2026-01-01T00:00:00",
+          "rows": [{ "iid": ":A1:", "name": "item", "owner": "p1", "owner_name": "one", "env": "bag", "pos": 1, "amount": 1 }]
+        },
+        {
+          "scanned_at": "2026-01-01T00:01:00",
+          "rows": [
+            { "iid": ":A1:", "name": "item", "owner": "p2", "owner_name": "two", "env": "bag", "pos": 1, "amount": 2 },
+            { "iid": ":A2:", "name": "item", "owner": "p1", "owner_name": "one", "env": "bag", "pos": 1, "amount": 1 }
+          ]
+        },
+        { "scanned_at": "2026-01-01T00:02:00", "rows": [] }
+      ]
+    },
+    {
+      "name": "消失后回归",
+      "scans": [
+        {
+          "scanned_at": "t0",
+          "rows": [{ "iid": ":A1:", "name": "item", "owner": "p1", "owner_name": "one", "env": "bag", "pos": 1, "amount": 1 }]
+        },
+        { "scanned_at": "t1", "rows": [] },
+        {
+          "scanned_at": "t2",
+          "rows": [{ "iid": ":A1:", "name": "item", "owner": "p1", "owner_name": "one", "env": "bag", "pos": 1, "amount": 1 }]
+        },
+        {
+          "scanned_at": "t3",
+          "rows": [{ "iid": ":A1:", "name": "item", "owner": "p1", "owner_name": "one", "env": "bag", "pos": 1, "amount": 9 }]
+        }
+      ]
+    },
+    {
+      "name": "空IID与重复IID",
+      "scans": [
+        {
+          "scanned_at": "t0",
+          "rows": [
+            { "iid": "::", "name": "skip", "owner": "p1", "owner_name": "one", "env": "bag", "pos": 1, "amount": 1 },
+            { "iid": ":A1:", "name": "item", "owner": "p1", "owner_name": "one", "env": "bag", "pos": 1, "amount": 1 },
+            { "iid": ":a1:", "name": "item", "owner": "p1", "owner_name": "one", "env": "bag", "pos": 1, "amount": 42 }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "无变化不产生事件",
+      "scans": [
+        {
+          "scanned_at": "t0",
+          "rows": [{ "iid": ":A1:", "name": "item", "owner": "p1", "owner_name": "one", "env": "bag", "pos": 1, "amount": 1 }]
+        },
+        {
+          "scanned_at": "t1",
+          "rows": [{ "iid": ":A1:", "name": "item", "owner": "p1", "owner_name": "one", "env": "bag", "pos": 1, "amount": 1 }]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ponytail Risk 控制台</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="app-page">
+    <section class="login-screen" id="login-screen">
+      <form class="login-box" id="login-form">
+        <a class="wordmark" href="/"><span class="brand-dot"></span>Ponytail Risk</a>
+        <h1>输入卡密登录</h1>
+        <p>登录后进入游戏行为风控控制台。卡密相当于账户密码，请勿转发。</p>
+        <label class="sr-only" for="portal-key">卡密</label>
+        <input id="portal-key" autocomplete="off" placeholder="PONYTAIL-XXXX-XXXX" />
+        <button class="primary-button full" type="submit">登录 <span aria-hidden="true">→</span></button>
+        <p class="form-error" id="login-error" role="alert"></p>
+      </form>
+    </section>
+
+    <div class="console-shell hidden" id="console-shell">
+      <aside class="sidebar">
+        <a class="wordmark sidebar-brand" href="/"><span class="brand-dot"></span>Ponytail Risk</a>
+        <span class="brand-tag">行为风控控制台</span>
+        <nav class="sidebar-nav" aria-label="控制台导航">
+          <button class="nav-button active" data-view="overview" type="button"><span>⌂</span>总览</button>
+          <button class="nav-button" data-view="player" type="button"><span>◎</span>玩家分析</button>
+          <button class="nav-button" data-view="asset" type="button"><span>↗</span>资产溯源</button>
+          <button class="nav-button" data-view="alerts" type="button"><span>▤</span>告警研判</button>
+          <button class="nav-button" data-view="rules" type="button"><span>◇</span>规则与设置</button>
+          <button class="nav-button" data-view="integration" type="button"><span><i data-lucide="plug-zap"></i></span>插件接入</button>
+        </nav>
+        <p class="side-publisher">该平台由 <a href="https://www.xihedun.com/" target="_blank" rel="noopener noreferrer">www.xihedun.com</a> 开源发布</p>
+        <div class="side-profile"><div class="avatar">PR</div><div><strong>生产观察组</strong><span>影子模式 · 运行中</span></div></div>
+      </aside>
+
+      <div class="main-shell">
+        <header class="topbar">
+          <span id="breadcrumb">风控中心 / 总览</span>
+          <div><button class="ghost-button" id="refresh-button" type="button">刷新状态</button><button class="ghost-button" id="logout-button" type="button">退出</button></div>
+        </header>
+        <main class="console-content" id="console-content" tabindex="-1"></main>
+      </div>
+
+      <nav class="mobile-nav" aria-label="移动端导航">
+        <button class="active" data-view="overview" type="button">总览</button>
+        <button data-view="player" type="button">玩家</button>
+        <button data-view="asset" type="button">溯源</button>
+        <button data-view="alerts" type="button">告警</button>
+        <button data-view="rules" type="button">规则</button>
+        <button data-view="integration" type="button">接入</button>
+      </nav>
+    </div>
+
+    <dialog class="disclaimer-dialog" id="disclaimer-dialog" aria-labelledby="disclaimer-title" aria-describedby="disclaimer-description">
+      <div class="disclaimer-card">
+        <span class="disclaimer-kicker">使用前须知</span>
+        <h2 id="disclaimer-title">免责声明</h2>
+        <div id="disclaimer-description" class="disclaimer-copy">
+          <p>本平台仅用于游戏行为风险辅助分析、证据整理和人工复核，不构成自动处罚依据。</p>
+          <p>AI 研判与统计模型可能存在误差。封停、扣除、冻结等操作必须由授权人员核验原始日志并人工确认。</p>
+          <p>使用者应确保已获得相关服务器、账号及数据的合法授权，并自行承担配置、判断和处置责任。</p>
+        </div>
+        <button class="primary-button full" id="disclaimer-accept" type="button">我已知悉，进入后台</button>
+      </div>
+    </dialog>
+
+    <script src="/vendor/lucide-0.468.0.min.js"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>

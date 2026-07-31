@@ -1,0 +1,17 @@
+# Rust 构建产物
+/target/
+/dist/
+# 运行时数据：本地快照账本、加密连接配置。不属于源码。
+/data/
+# Python 缓存（旧数据层仅作差分基准与回退保留）
+__pycache__/
+*.pyc
+# 本地凭据，绝不进版本库
+.env.local
+install-log.txt
+*.log
+*.obj
+/.idea/
+/.vscode/
+/backups/
+/work/

@@ -1,0 +1,19 @@
+[package]
+name = "wdsf-probe"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "wdsf-probe"
+path = "src/main.rs"
+
+[dependencies]
+anyhow.workspace = true
+clap.workspace = true
+mysql.workspace = true
+russh = { version = "0.54", default-features = false, features = ["flate2", "ring", "rsa"] }
+serde.workspace = true
+serde_json.workspace = true
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "io-util", "time"] }

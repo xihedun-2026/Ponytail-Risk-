@@ -1,0 +1,25 @@
+[Unit]
+Description=Ponytail Risk Local Plugin Agent
+After=network.target
+
+[Service]
+Type=simple
+User=game-risk
+Group=game-risk
+WorkingDirectory=/opt/game-behavior-risk
+EnvironmentFile=/etc/risk-agent.env
+ExecStart=/opt/game-behavior-risk/target/release/risk-agent serve
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectHome=true
+ProtectSystem=full
+CapabilityBoundingSet=
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+UMask=0027
+LimitNOFILE=4096
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,15 @@
+[package]
+name = "risk-sdk"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[lib]
+name = "risk_sdk"
+crate-type = ["cdylib", "staticlib", "rlib"]
+
+[dependencies]
+serde_json.workspace = true
+ureq.workspace = true
+url = "=2.5.4"

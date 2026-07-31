@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Ponytail Risk 游戏行为风控与资产溯源平台" />
+    <title>Ponytail Risk · 游戏行为风控与资产溯源</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="home-page">
+    <div class="notice-bar">重要提示：自动研判用于发现异常与暂存资产，永久处罚必须保留可回放证据并经过复核。</div>
+    <header class="home-nav">
+      <a class="wordmark" href="#top"><span class="brand-dot"></span>Ponytail Risk</a>
+      <nav aria-label="首页导航">
+        <a href="#capabilities">检测能力</a>
+        <a href="#trace">资产溯源</a>
+        <a href="#workflow">接入方式</a>
+      </nav>
+      <a class="nav-cta" href="/app">进入控制台</a>
+    </header>
+
+    <main id="top">
+      <section class="hero-band">
+        <img class="hero-visual" src="/assets/dashboard-preview.png" alt="Ponytail Risk 风控控制台" />
+        <div class="hero-shade"></div>
+        <div class="hero-inner">
+          <p class="eyebrow">游戏行为风控 · 资产来源可追溯</p>
+          <h1>每一笔元宝和道具<br /><span>都能解释它从哪里来</span></h1>
+          <p class="hero-copy">从生成、领取、交易到消耗，实时识别重复结算、异常归集和团伙转移。</p>
+
+          <form class="access-card" id="home-login">
+            <div>
+              <strong>输入卡密，进入风控控制台</strong>
+              <p>本地演示卡密：PONYTAIL-DEMO-2026</p>
+            </div>
+            <label for="home-key">卡密 CDK</label>
+            <div class="key-row">
+              <input id="home-key" autocomplete="off" placeholder="PONYTAIL-XXXX-XXXX" />
+              <button class="primary-button" type="submit">进入控制台 <span aria-hidden="true">→</span></button>
+            </div>
+            <p class="form-error" id="home-error" role="alert"></p>
+          </form>
+
+          <div class="hero-pills" aria-label="核心能力">
+            <span>资产流水完整</span><span>异常实时评分</span><span>团伙路径发现</span><span>处罚证据可回放</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-band warm" id="capabilities">
+        <div class="section-inner">
+          <p class="section-kicker">检测层级</p>
+          <h2>确定性规则先拦截，AI 负责找到藏得更深的路径</h2>
+          <p class="section-lead">规则、行为统计、关系图谱和异常模型分层协作。任何告警都能回到原始流水，而不是只给一个无法解释的分数。</p>
+
+          <div class="stage-row" role="tablist" aria-label="检测视角">
+            <button class="stage-button active" data-stage="实时" type="button">实时检测</button>
+            <button class="stage-button" data-stage="离线" type="button">离线研判</button>
+          </div>
+
+          <div class="capability-grid">
+            <article class="capability-card">
+              <span class="card-index">01</span>
+              <p class="card-kicker">账本守恒</p>
+              <h3>资产重复与非法来源</h3>
+              <p>同一装备序列号重复出现、余额变化缺少来源、奖励超过配置上限，立即阻断。</p>
+              <ul><li>唯一资产冲突</li><li>重复结算与重放</li><li>前后余额不一致</li></ul>
+            </article>
+            <article class="capability-card featured">
+              <span class="popular">重点能力</span>
+              <span class="card-index">02</span>
+              <p class="card-kicker">行为异常</p>
+              <h3>刷元宝与刷道具识别</h3>
+              <p>按等级、职业、区服与玩法建立同群体基线，识别异常收益速度和机械重复行为。</p>
+              <ul><li>收益速率偏离</li><li>高频固定路径</li><li>账号生命周期异常</li></ul>
+            </article>
+            <article class="capability-card">
+              <span class="card-index">03</span>
+              <p class="card-kicker">关系图谱</p>
+              <h3>小号归集与团伙转移</h3>
+              <p>连接账号、角色、设备、IP、交易和道具，发现星型归集、环形转账与多层中转。</p>
+              <ul><li>共同设备群</li><li>低价洗道具</li><li>受益主号定位</li></ul>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-band dark-band" id="trace">
+        <div class="section-inner trace-layout">
+          <div class="trace-copy">
+            <p class="section-kicker">资产证据链</p>
+            <h2>不是看玩家有多少，而是看这些资产为什么属于他</h2>
+            <p>每件高价值道具保留唯一序列号，可堆叠道具使用批次编号。点击任意节点即可回看生成配置、交易双方、价格与关联设备。</p>
+            <div class="trace-stats"><span><b>100%</b>高价值资产覆盖</span><span><b>&lt; 3s</b>完整路径查询</span></div>
+          </div>
+          <div class="asset-flow" aria-label="资产流转示意">
+            <div class="flow-node source"><small>14:02:11</small><strong>活动生成</strong><span>配置上限异常</span></div>
+            <div class="flow-line danger"></div>
+            <div class="flow-node"><small>14:03:20</small><strong>青竹小号07</strong><span>同设备账号</span></div>
+            <div class="flow-line"></div>
+            <div class="flow-node"><small>14:18:44</small><strong>北境长歌</strong><span>低价摆摊归集</span></div>
+            <div class="flow-line danger"></div>
+            <div class="flow-node hold"><small>14:31:19</small><strong>跨服挂单</strong><span>已暂存</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-band" id="workflow">
+        <div class="section-inner">
+          <p class="section-kicker">接入路径</p>
+          <h2>从游戏服权威事件开始，三步形成闭环</h2>
+          <div class="steps-grid">
+            <article><span>01</span><h3>统一记账</h3><p>把任务、掉落、交易、邮件、仓库与消耗接入统一事件流水。</p></article>
+            <article><span>02</span><h3>影子运行</h3><p>只报警不处罚，使用真实玩家数据校准规则和误报边界。</p></article>
+            <article><span>03</span><h3>分级处置</h3><p>观察、限流、暂存、回收逐级执行，封号只基于强证据。</p></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section-band warm">
+        <div class="section-inner data-layout">
+          <div>
+            <p class="section-kicker">实时态势</p>
+            <h2>风险是否增长，一眼就能判断</h2>
+            <p class="section-lead">按区服、玩法和资产类型聚合，不用在几百万条日志中手工找线索。</p>
+          </div>
+          <div class="meter-panel">
+            <div class="meter-head"><span>今日资产事件</span><strong>2,846,192</strong></div>
+            <div class="mini-bars" aria-label="每小时风险事件趋势">
+              <i style="--h:38%"></i><i style="--h:52%"></i><i style="--h:46%"></i><i style="--h:69%"></i><i style="--h:58%"></i><i style="--h:82%"></i><i style="--h:64%"></i><i style="--h:91%"></i><i style="--h:71%"></i><i style="--h:56%"></i><i style="--h:76%"></i><i style="--h:88%"></i>
+            </div>
+            <div class="meter-legend"><span><i class="green-dot"></i>正常 96.4%</span><span><i class="coral-dot"></i>需研判 3.6%</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="faq-band">
+        <div class="section-inner faq-layout-home">
+          <div><p class="section-kicker">常见问题</p><h2>上线风控前最需要确认的事</h2></div>
+          <div class="faq-list-home">
+            <details open><summary>需要先训练 AI 模型吗？</summary><p>不需要。先完成资产流水和确定性规则，积累真实复核标签后再训练模型。</p></details>
+            <details><summary>客户端上报能当作资产证据吗？</summary><p>不能。资产变化必须以游戏服务器权威记账为准，客户端完整性仅作为辅助风险信号。</p></details>
+            <details><summary>会不会误封正常玩家？</summary><p>第一阶段采用影子模式与资产暂存。永久处罚必须有强规则证据或人工复核。</p></details>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="home-footer">
+      <div><a class="wordmark" href="#top"><span class="brand-dot"></span>Ponytail Risk</a><p>游戏行为风控、资产溯源与案件研判平台。</p></div>
+      <div><strong>产品</strong><a href="#capabilities">检测能力</a><a href="#trace">资产溯源</a><a href="/app">用户控制台</a></div>
+      <div><strong>原则</strong><span>服务端权威</span><span>证据可回放</span><span>处置可审计</span></div>
+    </footer>
+
+    <script src="/home.js"></script>
+  </body>
+</html>

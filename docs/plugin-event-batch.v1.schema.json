@@ -1,0 +1,283 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ponytail.example/schemas/plugin-event-batch.v1.schema.json",
+  "title": "Ponytail Risk plugin event batch v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "producer", "sent_at", "events"],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "producer": { "$ref": "#/$defs/producer" },
+    "sent_at": { "type": "string", "format": "date-time" },
+    "events": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 200,
+      "items": { "$ref": "#/$defs/event" }
+    }
+  },
+  "$defs": {
+    "producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["plugin_name", "plugin_version", "game_build", "boot_id"],
+      "properties": {
+        "plugin_name": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "plugin_version": { "type": "string", "minLength": 1, "maxLength": 32 },
+        "game_build": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "boot_id": { "type": "string", "minLength": 8, "maxLength": 128 }
+      }
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "event_id",
+        "sequence",
+        "event_type",
+        "status",
+        "occurred_at",
+        "actor",
+        "context",
+        "data"
+      ],
+      "properties": {
+        "event_id": { "type": "string", "minLength": 16, "maxLength": 128 },
+        "sequence": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+        "event_type": {
+          "type": "string",
+          "enum": [
+            "session.started",
+            "session.heartbeat",
+            "session.ended",
+            "state.player_snapshot",
+            "ledger.currency_changed",
+            "ledger.asset_created",
+            "ledger.asset_moved",
+            "ledger.asset_changed",
+            "ledger.asset_destroyed",
+            "ledger.reward_granted",
+            "ledger.trade_committed",
+            "security.action_attempted",
+            "security.validation_failed"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["attempted", "succeeded", "rejected", "failed", "rolled_back"]
+        },
+        "occurred_at": { "type": "string", "format": "date-time" },
+        "server_tick": { "type": "integer", "minimum": 0, "maximum": 9007199254740991 },
+        "transaction_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "decision_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "actor": { "$ref": "#/$defs/actor" },
+        "context": { "$ref": "#/$defs/context" },
+        "data": { "$ref": "#/$defs/data" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "event_type": { "pattern": "^ledger\\." } } },
+          "then": { "required": ["transaction_id"] }
+        },
+        {
+          "if": { "properties": { "event_type": { "const": "ledger.currency_changed" } } },
+          "then": { "properties": { "data": { "required": ["currency_changes"] } } }
+        },
+        {
+          "if": {
+            "properties": {
+              "event_type": {
+                "enum": [
+                  "ledger.asset_created",
+                  "ledger.asset_moved",
+                  "ledger.asset_changed",
+                  "ledger.asset_destroyed"
+                ]
+              }
+            }
+          },
+          "then": { "properties": { "data": { "required": ["asset_changes"] } } }
+        },
+        {
+          "if": { "properties": { "event_type": { "const": "state.player_snapshot" } } },
+          "then": { "properties": { "data": { "required": ["player_state"] } } }
+        },
+        {
+          "if": { "properties": { "event_type": { "const": "security.validation_failed" } } },
+          "then": { "properties": { "data": { "required": ["validation"] } } }
+        }
+      ]
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["player_id"],
+      "properties": {
+        "player_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "account_id": { "type": "string", "maxLength": 128 },
+        "character_id": { "type": "string", "maxLength": 128 },
+        "session_id": { "type": "string", "maxLength": 128 },
+        "device_fingerprint": { "type": "string", "maxLength": 256 },
+        "client_ip": { "type": "string", "maxLength": 64 }
+      }
+    },
+    "position": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y"],
+      "properties": {
+        "x": { "type": "number" },
+        "y": { "type": "number" },
+        "z": { "type": "number" }
+      }
+    },
+    "context": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "action_code": { "type": "string", "maxLength": 128 },
+        "reason_code": { "type": "string", "maxLength": 128 },
+        "source_type": { "type": "string", "maxLength": 64 },
+        "source_id": { "type": "string", "maxLength": 128 },
+        "config_version": { "type": "string", "maxLength": 128 },
+        "map_id": { "type": "string", "maxLength": 128 },
+        "position": { "$ref": "#/$defs/position" },
+        "client_version": { "type": "string", "maxLength": 64 },
+        "request_id": { "type": "string", "maxLength": 128 }
+      }
+    },
+    "currency_change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner_id", "currency", "before", "after", "delta"],
+      "properties": {
+        "owner_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "currency": { "enum": ["game_cash", "gold_coin", "silver_coin"] },
+        "before": { "type": "string", "pattern": "^[0-9]+$" },
+        "after": { "type": "string", "pattern": "^[0-9]+$" },
+        "delta": { "type": "string", "pattern": "^-?[0-9]+$" },
+        "balance_version": { "type": "string", "maxLength": 128 }
+      }
+    },
+    "asset_change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["asset_id", "asset_kind", "operation", "template_id", "quantity_before", "quantity_after"],
+      "properties": {
+        "asset_id": { "type": "string", "minLength": 1, "maxLength": 256 },
+        "asset_kind": { "enum": ["item", "pet"] },
+        "operation": { "enum": ["create", "move", "change", "destroy"] },
+        "template_id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 256 },
+        "quantity_before": { "type": "integer", "minimum": 0 },
+        "quantity_after": { "type": "integer", "minimum": 0 },
+        "owner_before": { "type": "string", "maxLength": 128 },
+        "owner_after": { "type": "string", "maxLength": 128 },
+        "container_before": { "type": "string", "maxLength": 128 },
+        "container_after": { "type": "string", "maxLength": 128 },
+        "slot_before": { "type": "integer", "minimum": -1 },
+        "slot_after": { "type": "integer", "minimum": -1 },
+        "attributes_before": { "type": "object" },
+        "attributes_after": { "type": "object" }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "operation": { "const": "create" } } },
+          "then": {
+            "required": ["owner_after"],
+            "properties": {
+              "quantity_before": { "const": 0 },
+              "quantity_after": { "minimum": 1 },
+              "owner_after": { "minLength": 1 }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "operation": { "const": "move" } } },
+          "then": {
+            "required": ["owner_before", "owner_after"],
+            "properties": {
+              "quantity_before": { "minimum": 1 },
+              "quantity_after": { "minimum": 1 },
+              "owner_before": { "minLength": 1 },
+              "owner_after": { "minLength": 1 }
+            }
+          }
+        },
+        {
+          "if": { "properties": { "operation": { "const": "destroy" } } },
+          "then": {
+            "required": ["owner_before"],
+            "properties": {
+              "quantity_before": { "minimum": 1 },
+              "quantity_after": { "const": 0 },
+              "owner_before": { "minLength": 1 }
+            }
+          }
+        }
+      ]
+    },
+    "player_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["online", "level", "currencies"],
+      "properties": {
+        "online": { "type": "boolean" },
+        "in_combat": { "type": "boolean" },
+        "level": { "type": "integer", "minimum": 0 },
+        "map_id": { "type": "string", "maxLength": 128 },
+        "position": { "$ref": "#/$defs/position" },
+        "currencies": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["game_cash", "gold_coin", "silver_coin"],
+          "properties": {
+            "game_cash": { "type": "string", "pattern": "^[0-9]+$" },
+            "gold_coin": { "type": "string", "pattern": "^[0-9]+$" },
+            "silver_coin": { "type": "string", "pattern": "^[0-9]+$" }
+          }
+        },
+        "inventory_digest": { "type": "string", "maxLength": 256 }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule_code", "severity", "message"],
+      "properties": {
+        "rule_code": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "severity": { "enum": ["info", "low", "medium", "high", "critical"] },
+        "message": { "type": "string", "minLength": 1, "maxLength": 512 },
+        "expected": {},
+        "observed": {}
+      }
+    },
+    "data": {
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "properties": {
+        "currency_changes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": { "$ref": "#/$defs/currency_change" }
+        },
+        "asset_changes": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 200,
+          "items": { "$ref": "#/$defs/asset_change" }
+        },
+        "player_state": { "$ref": "#/$defs/player_state" },
+        "validation": { "$ref": "#/$defs/validation" },
+        "metadata": {
+          "type": "object",
+          "maxProperties": 32,
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}
