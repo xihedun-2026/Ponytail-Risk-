@@ -7,7 +7,7 @@
 
 面向私有游戏服务器的开源行为风控与证据复核平台。它把只读数据库分析、游戏插件实时事件、资产链路、规则评分和 AI 辅助研判放进同一个控制台，并明确保留人工处置边界。
 
-项目由 [熙和盾](https://www.xihedun.com/) 开源发布，采用 [MIT License](LICENSE)。
+项目由 [羲和盾](https://www.xihedun.com/) 开源发布，采用 [MIT License](LICENSE)。
 
 > 当前内置数据适配器面向私有游戏服务器。其他游戏可以复用 `risk-agent`、C ABI SDK、事件合同和 Web 控制层，并实现自己的只读适配器。
 
